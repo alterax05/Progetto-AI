@@ -1,4 +1,4 @@
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -12,11 +12,11 @@ import { Link } from "react-router-dom";
 
 function Home() {
   return (
-    <div className="flex items-center justify-center h-screen flex-col">
+    <div className="flex items-center space-x-10">
       <h1 className="text-5xl m-16">
         <b>Progetto AI</b>
       </h1>
-      <div className="flex flex-row space-x-10">
+      <div className="flex flex-row items-center justify-center min-h-screen">
         <Card className="hover:drop-shadow-lg">
           <CardHeader>
             <CardTitle>Ricerca TPSI</CardTitle>

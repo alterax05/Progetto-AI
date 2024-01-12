@@ -3,7 +3,10 @@ import ReactDOM from "react-dom/client";
 import Home from "@/pages/Home.tsx";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import ErrorPage from "./pages/error-page";
+import ErrorPage from "./pages/ErrorPage";
+import TPSI from "./pages/TPSI";
+import GestioneProgetto from "./pages/GestioneProgetto";
+import Playground from "./pages/Playground";
 
 const router = createBrowserRouter([
   {
@@ -11,7 +14,25 @@ const router = createBrowserRouter([
     element: <Home />,
     errorElement: <ErrorPage />,
   },
-  
+  {
+    path: "/tpsi",
+    element: <TPSI />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/progetto",
+    element: <GestioneProgetto />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/playground",
+    element: <Playground />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "*",
+    element: <ErrorPage />,
+  }
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
