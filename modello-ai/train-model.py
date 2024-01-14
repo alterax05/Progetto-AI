@@ -2,15 +2,24 @@ from torch import nn
 from torch.optim import Adam
 from torch.utils.data import DataLoader
 from torchvision import datasets
-from torchvision.transforms import ToTensor
+from torchvision.transforms import ToTensor, RandomHorizontalFlip, RandomRotation, Compose, RandomErasing
 from torch import cuda
 import torch
 
 # Get the device
 device = 'cuda' if cuda.is_available() else 'cpu'
 
+# Define your transformations
+transform = Compose([
+    ToTensor(),
+    RandomHorizontalFlip(),
+    RandomRotation(10),
+    RandomErasing(),
+    # Add more transformations as needed
+])
+
 # Get the dataset
-dataset = datasets.MNIST('dataset', download=True, train=True, transform=ToTensor())
+dataset = datasets.MNIST('dataset', download=True, train=True, transform=transform)
 
 # Get the dataloader
 dataloader = DataLoader(dataset, batch_size=64)
