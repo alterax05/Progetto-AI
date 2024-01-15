@@ -2,7 +2,7 @@ from torch import nn
 from torch.optim import Adam
 from torch.utils.data import DataLoader
 from torchvision import datasets
-from torchvision.transforms import ToTensor, RandomHorizontalFlip, RandomRotation, Compose, RandomErasing
+from torchvision.transforms import ToTensor, RandomRotation, Compose, RandomErasing, RandomCrop
 from torch import cuda
 import torch
 
@@ -12,9 +12,9 @@ device = 'cuda' if cuda.is_available() else 'cpu'
 # Define your transformations
 transform = Compose([
     ToTensor(),
-    RandomHorizontalFlip(),
     RandomRotation(10),
     RandomErasing(),
+    RandomCrop(28, padding=4),
     # Add more transformations as needed
 ])
 
