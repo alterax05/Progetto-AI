@@ -8,15 +8,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { MoveRight } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
 
 function Home() {
   return (
-    <div className="flex flex-row items-center justify-center min-h-screen">
+    <div className="flex flex-row items-center justify-self-center h-screen">
       <h1 className="text-5xl m-16">
         <b>Progetto AI</b>
       </h1>
       <div className="flex items-center space-x-10">
+        <Separator orientation="vertical" className="h-[50vh] w-0.5" />
         <Card className="hover:drop-shadow-lg">
           <CardHeader>
             <CardTitle>Ricerca TPSI</CardTitle>

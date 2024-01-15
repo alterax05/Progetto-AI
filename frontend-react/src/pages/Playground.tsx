@@ -11,15 +11,15 @@ function Playground() {
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
 
   const [isDrawing, setIsDrawing] = useState(false);
-  const [predictedClass, setPredictedClass] = useState<number | null>(null);
+  const [predictedClass, setPredictedClass] = useState<number | null>(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
-      canvas.width = 500;
-      canvas.height = 500;
-      canvas.style.width = "500px";
-      canvas.style.height = "500px";
+      canvas.width = 400;
+      canvas.height = 400;
+      canvas.style.width = "400px";
+      canvas.style.height = "400px";
 
       const context = canvas.getContext("2d", { willReadFrequently: true });
       if (context) {
@@ -48,12 +48,12 @@ function Playground() {
     for (let i = 0; i < imageBuffer.length; i += 4) {
       alphaChannel.push(imageBuffer[i + 3]);
     }
-    // 2. transpose the image data from [28, 28, 1]
+    //Create floatArray from alphaChannel
     const float32Data = new Float32Array(dims[1] * dims[2] * dims[3]);
     for (let i = 0; i < alphaChannel.length; i++) {
       float32Data[i] = alphaChannel[i] / 255.0;
     }
-    // 3. create the tensor object from onnxruntime-web.
+    //Create the tensor object from onnxruntime-web.
     const inputTensor = new Tensor("float32", float32Data, dims);
     return inputTensor;
   }
@@ -86,10 +86,12 @@ function Playground() {
       const outputMap = await session.run(feeds);
       const outputTensor = outputMap[session.outputNames[0]];
       const outputData = outputTensor.data as Float32Array;
+      console.log(outputData);
       const predictedClass = outputData.indexOf(Math.max(...outputData));
       setPredictedClass(predictedClass);
     }
   };
+
   const startDrawing = ({ nativeEvent }: MouseEvent<HTMLCanvasElement>) => {
     const { offsetX, offsetY } = nativeEvent;
     if (contextRef.current) {
@@ -131,20 +133,24 @@ function Playground() {
 
   return (
     <div>
-      <h1 className="text-5xl m-16">
+      <h1 className="flex justify-center text-5xl m-16">
         <b>Playground</b>
       </h1>
-      <p>{predictedClass}</p>
-      <canvas
-        onMouseDown={startDrawing}
-        onMouseUp={finishDrawing}
-        onMouseMove={draw}
-        ref={canvasRef}
-        className="border-2 border-black rounded-md"
-      />
-      <Button onClick={clearCanvas}>
-        <b>Elimina</b>
-      </Button>
+      <div className="flex flex-row items-center justify-evenly">
+        <canvas
+          onMouseDown={startDrawing}
+          onMouseUp={finishDrawing}
+          onMouseMove={draw}
+          ref={canvasRef}
+          className="bg-slate-200 rounded-md"
+        />
+        <div>
+          <p className="border-2 border-red-800">{predictedClass}</p>
+          <Button onClick={clearCanvas} variant="destructive">
+            <b>Elimina</b>
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
