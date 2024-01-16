@@ -2,6 +2,16 @@ import { InferenceSession, Tensor } from "onnxruntime-web";
 
 import { Button } from "@/components/ui/button.tsx";
 
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
 import { useRef, useEffect, useState, MouseEvent } from "react";
 
 import pica from "pica";
@@ -12,6 +22,9 @@ function Playground() {
 
   const [isDrawing, setIsDrawing] = useState(false);
   const [predictedClass, setPredictedClass] = useState<number | null>(0);
+  const [predictedProbability, setPredictedProbability] = useState<
+    { id: Number; value: Number }[] | null
+  >(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -87,6 +100,11 @@ function Playground() {
       const outputTensor = outputMap[session.outputNames[0]];
       const outputData = outputTensor.data as Float32Array;
       console.log(outputData);
+      setPredictedProbability(
+        [...outputData]
+          .map((value, index) => ({ id: index, value: value }))
+          .sort((a, b) => b.value - a.value)
+      );
       const predictedClass = outputData.indexOf(Math.max(...outputData));
       setPredictedClass(predictedClass);
     }
@@ -145,7 +163,22 @@ function Playground() {
           className="bg-slate-200 rounded-md"
         />
         <div>
-          <p className="border-2 border-red-800">{predictedClass}</p>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[100px]">Numero</TableHead>
+                <TableHead>Probabilita</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+                {predictedProbability?.map((value) => (
+                  <TableRow>
+                  <TableCell className="font-medium">{value.id.toString()}</TableCell>
+                  <TableCell>{value.value.toString()}</TableCell>
+                </TableRow>
+              ))}
+              </TableBody>
+          </Table>
           <Button onClick={clearCanvas} variant="destructive">
             <b>Elimina</b>
           </Button>
