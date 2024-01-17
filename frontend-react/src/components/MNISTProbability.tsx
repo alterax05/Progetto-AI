@@ -22,8 +22,6 @@ function MNISTProbability({
     })
     : Array(10).fill(10).map((_, index) => ({ key: index, value: 0 }));
 
-    console.log(predictedProbability);
-
   return (
     <ScrollArea className="h-72 w-48 rounded-md border">
       <div className="p-4">

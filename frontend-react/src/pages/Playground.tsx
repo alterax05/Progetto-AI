@@ -11,7 +11,7 @@ function Playground() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [selectedModel, setSelectedModel] = useState("MNIST Cifre");
+  const [selectedModel, setSelectedModel] = useState("Quick, Draw!");
   const [outputModel, setOutputModel] = useState<Float32Array | null>(null);
 
   useEffect(() => {

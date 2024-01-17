@@ -5,7 +5,6 @@ import { Separator } from "@/components/ui/separator.tsx";
 function QuickDrawProbability({outputModel}: {outputModel: Float32Array | null}) {
   const classes = [
     'Torre Eiffel',
-    'Tenda',
     'Aereo',
     'Ambulanza',
     'Mela',
@@ -14,17 +13,18 @@ function QuickDrawProbability({outputModel}: {outputModel: Float32Array | null})
     'Palla da baseball',
     'Palla da basket',
     'Torta di compleanno',
-    'Maglietta',
-    'Triangolo',
+    'Tazza da caffè',
     'Elefante',
     'Chitarra',
-    'Arcobaleno',
     'Faro',
-    'Televisione',
-    'Pupazzo di neve',
     'Pinguino',
-    'Tazza da caffè'
-  ];
+    'Arcobaleno',
+    'Pupazzo di neve',
+    'Maglietta',
+    'Televisione',
+    'Tenda',
+    'Triangolo',
+  ]
 
   const predictedProbability = outputModel
     ? [...outputModel]
