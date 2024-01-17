@@ -2,15 +2,11 @@ import { InferenceSession, Tensor } from "onnxruntime-web";
 
 import { Button } from "@/components/ui/button.tsx";
 
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Progress } from "@/components/ui/progress"
+
+import { ScrollArea } from "@/components/ui/scroll-area.tsx";
+
+import { Separator } from "@/components/ui/separator.tsx";
 
 import { useRef, useEffect, useState, MouseEvent } from "react";
 
@@ -21,10 +17,9 @@ function Playground() {
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
 
   const [isDrawing, setIsDrawing] = useState(false);
-  const [predictedClass, setPredictedClass] = useState<number | null>(0);
   const [predictedProbability, setPredictedProbability] = useState<
-    { id: Number; value: Number }[] | null
-  >(null);
+    { key: number; value: number }[]
+  >(Array(10).fill({ key: 0, value: 0 }).map((value, index) => ({ key: index, value: 0 })));
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -99,14 +94,19 @@ function Playground() {
       const outputMap = await session.run(feeds);
       const outputTensor = outputMap[session.outputNames[0]];
       const outputData = outputTensor.data as Float32Array;
-      console.log(outputData);
       setPredictedProbability(
         [...outputData]
-          .map((value, index) => ({ id: index, value: value }))
+          .map((value, index) => ({ key: index, value: value }))
           .sort((a, b) => b.value - a.value)
+          .map((value, _ , array) => {
+            return {
+              key: value.key,
+              value:
+                ((value.value - array[array.length - 1].value) /
+                (array[0].value - array[array.length - 1].value) * 100),
+            };
+          })
       );
-      const predictedClass = outputData.indexOf(Math.max(...outputData));
-      setPredictedClass(predictedClass);
     }
   };
 
@@ -146,7 +146,7 @@ function Playground() {
     if (context && canvas) {
       context.clearRect(0, 0, canvas.width, canvas.height);
     }
-    setPredictedClass(null);
+    setPredictedProbability(Array(10).fill({ key: 0, value: 0 }).map((_, index) => ({ key: index, value: 0 })));
   };
 
   return (
@@ -162,23 +162,28 @@ function Playground() {
           ref={canvasRef}
           className="bg-slate-200 rounded-md"
         />
-        <div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[100px]">Numero</TableHead>
-                <TableHead>Probabilita</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-                {predictedProbability?.map((value) => (
-                  <TableRow>
-                  <TableCell className="font-medium">{value.id.toString()}</TableCell>
-                  <TableCell>{value.value.toString()}</TableCell>
-                </TableRow>
-              ))}
-              </TableBody>
-          </Table>
+        <div className="flex flex-col items-center justify-center space-y-5">
+          {(
+            <ScrollArea className="h-72 w-48 rounded-md border">
+              <div className="p-4">
+                <h4 className="mb-4 text-sm font-medium leading-none">
+                  Probabilità
+                </h4>
+                {predictedProbability.map((value, index) => (
+                  <>
+                    <div key={index} className="text-sm">
+                      <b>{value.key.toString()}</b>:{" "}
+                      {value.value.toFixed(2).toString()}
+                      <Progress
+                        className="w-full h-2 mt-2 rounded-md"
+                        value={value.value}/>
+                    </div>
+                    <Separator className="my-2" />
+                  </>
+                ))}
+              </div>
+            </ScrollArea>
+          )}
           <Button onClick={clearCanvas} variant="destructive">
             <b>Elimina</b>
           </Button>
