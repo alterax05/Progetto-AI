@@ -1,33 +1,26 @@
 import { InferenceSession, Tensor } from "onnxruntime-web";
-
 import { Button } from "@/components/ui/button.tsx";
-
-import { Progress } from "@/components/ui/progress"
-
-import { ScrollArea } from "@/components/ui/scroll-area.tsx";
-
-import { Separator } from "@/components/ui/separator.tsx";
-
 import { useRef, useEffect, useState, MouseEvent } from "react";
-
 import pica from "pica";
+import modelQuickDrawUrl from "../../../modello-ai/QuickDraw-drawing-recognition/model.onnx?url";
+import modelNMNISTDigitUrl from "../../../modello-ai/MNIST-digit-recognition/model.onnx?url";
+import QuickDrawProbability from "@/components/QuickDrawProbability";
+import MNISTProbability from "@/components/MNISTProbability";
 
 function Playground() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
-
   const [isDrawing, setIsDrawing] = useState(false);
-  const [predictedProbability, setPredictedProbability] = useState<
-    { key: number; value: number }[]
-  >(Array(10).fill({ key: 0, value: 0 }).map((value, index) => ({ key: index, value: 0 })));
+  const [selectedModel, setSelectedModel] = useState("MNIST Cifre");
+  const [outputModel, setOutputModel] = useState<Float32Array | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
-      canvas.width = 400;
-      canvas.height = 400;
-      canvas.style.width = "400px";
-      canvas.style.height = "400px";
+      canvas.width = 500;
+      canvas.height = 500;
+      canvas.style.width = "500px";
+      canvas.style.height = "500px";
 
       const context = canvas.getContext("2d", { willReadFrequently: true });
       if (context) {
@@ -41,7 +34,16 @@ function Playground() {
   }, []);
 
   const inferenceSession = async () => {
-    return await InferenceSession.create("/model.onnx", {
+    let model: string;
+    switch (selectedModel) {
+      case "Quick, Draw!":
+        model = modelQuickDrawUrl;
+        break;
+      default:
+        model = modelNMNISTDigitUrl
+        break;
+    }
+    return InferenceSession.create(model, {
       executionProviders: ["webgl"],
       graphOptimizationLevel: "all",
     });
@@ -93,20 +95,7 @@ function Playground() {
       feeds[session.inputNames[0]] = input;
       const outputMap = await session.run(feeds);
       const outputTensor = outputMap[session.outputNames[0]];
-      const outputData = outputTensor.data as Float32Array;
-      setPredictedProbability(
-        [...outputData]
-          .map((value, index) => ({ key: index, value: value }))
-          .sort((a, b) => b.value - a.value)
-          .map((value, _ , array) => {
-            return {
-              key: value.key,
-              value:
-                ((value.value - array[array.length - 1].value) /
-                (array[0].value - array[array.length - 1].value) * 100),
-            };
-          })
-      );
+      setOutputModel(outputTensor.data as Float32Array);
     }
   };
 
@@ -146,7 +135,7 @@ function Playground() {
     if (context && canvas) {
       context.clearRect(0, 0, canvas.width, canvas.height);
     }
-    setPredictedProbability(Array(10).fill({ key: 0, value: 0 }).map((_, index) => ({ key: index, value: 0 })));
+    setOutputModel(null)
   };
 
   return (
@@ -163,26 +152,11 @@ function Playground() {
           className="bg-slate-200 rounded-md"
         />
         <div className="flex flex-col items-center justify-center space-y-5">
-          {(
-            <ScrollArea className="h-72 w-48 rounded-md border">
-              <div className="p-4">
-                <h4 className="mb-4 text-sm font-medium leading-none">
-                  Probabilità
-                </h4>
-                {predictedProbability.map((value, index) => (
-                  <>
-                    <div key={index} className="text-sm">
-                      <b>{value.key.toString()}</b>:{" "}
-                      {value.value.toFixed(2).toString()}
-                      <Progress
-                        className="w-full h-2 mt-2 rounded-md"
-                        value={value.value}/>
-                    </div>
-                    <Separator className="my-2" />
-                  </>
-                ))}
-              </div>
-            </ScrollArea>
+          {selectedModel == "Quick, Draw!" && (
+            <QuickDrawProbability outputModel={outputModel} />
+          )}
+          {selectedModel == "MNIST Cifre" && (
+            <MNISTProbability outputModel={outputModel} />
           )}
           <Button onClick={clearCanvas} variant="destructive">
             <b>Elimina</b>
