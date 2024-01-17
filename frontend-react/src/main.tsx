@@ -7,6 +7,7 @@ import ErrorPage from "./pages/ErrorPage";
 import TPSI from "./pages/TPSI";
 import GestioneProgetto from "./pages/GestioneProgetto";
 import Playground from "./pages/Playground";
+import { ChakraProvider } from "@chakra-ui/react";
 
 const router = createBrowserRouter([
   {
@@ -32,11 +33,13 @@ const router = createBrowserRouter([
   {
     path: "*",
     element: <ErrorPage />,
-  }
+  },
 ]);
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+ReactDOM.createRoot(document.getElementById("root")!).render(  
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <ChakraProvider>
+      <RouterProvider router={router} />
+    </ChakraProvider>
   </React.StrictMode>
 );
