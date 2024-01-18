@@ -8,6 +8,7 @@ import TPSI from "./pages/TPSI";
 import GestioneProgetto from "./pages/GestioneProgetto";
 import Playground from "./pages/Playground";
 import { ChakraProvider } from "@chakra-ui/react";
+import App from "@/App.tsx";
 
 const router = createBrowserRouter([
   {
@@ -39,7 +40,9 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")!).render(  
   <React.StrictMode>
     <ChakraProvider>
-      <RouterProvider router={router} />
+      <App >
+        <RouterProvider router={router} />
+      </App>
     </ChakraProvider>
   </React.StrictMode>
 );
