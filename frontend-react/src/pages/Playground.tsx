@@ -6,12 +6,15 @@ import modelQuickDrawUrl from "../../../modello-ai/QuickDraw-drawing-recognition
 import modelNMNISTDigitUrl from "../../../modello-ai/MNIST-digit-recognition/model.onnx?url";
 import QuickDrawProbability from "@/components/QuickDrawProbability";
 import MNISTProbability from "@/components/MNISTProbability";
+import { Switch } from "@/components/ui/switch.tsx";
+import { Label } from "@/components/ui/label.tsx";
+import { ThumbsUp, ThumbsDown } from 'lucide-react';
 
 function Playground() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [selectedModel, setSelectedModel] = useState("Quick, Draw!");
+  const [selectedModel, setSelectedModel] = useState(false); //False = QuickDraw, True = MNIST
   const [outputModel, setOutputModel] = useState<Float32Array | null>(null);
 
   useEffect(() => {
@@ -34,18 +37,9 @@ function Playground() {
   }, []);
 
   const inferenceSession = async () => {
-    let model: string;
-    switch (selectedModel) {
-      case "Quick, Draw!":
-        model = modelQuickDrawUrl;
-        break;
-      default:
-        model = modelNMNISTDigitUrl
-        break;
-    }
+    let model: string = selectedModel ? modelQuickDrawUrl : modelNMNISTDigitUrl;
     return InferenceSession.create(model, {
       executionProviders: ["webgl"],
-      graphOptimizationLevel: "all",
     });
   };
 
@@ -135,12 +129,12 @@ function Playground() {
     if (context && canvas) {
       context.clearRect(0, 0, canvas.width, canvas.height);
     }
-    setOutputModel(null)
+    setOutputModel(null);
   };
 
   return (
     <div>
-      <h1 className="flex justify-center text-5xl m-16">
+      <h1 className="flex justify-center text-5xl m-14">
         <b>Playground</b>
       </h1>
       <div className="flex flex-row items-center justify-evenly">
@@ -152,15 +146,34 @@ function Playground() {
           className="bg-slate-200 rounded-md"
         />
         <div className="flex flex-col items-center justify-center space-y-5">
-          {selectedModel == "Quick, Draw!" && (
-            <QuickDrawProbability outputModel={outputModel} />
-          )}
-          {selectedModel == "MNIST Cifre" && (
-            <MNISTProbability outputModel={outputModel} />
-          )}
-          <Button onClick={clearCanvas} variant="destructive">
-            <b>Elimina</b>
-          </Button>
+          <div className="flex items-center space-x-2">
+            <Label htmlFor="model-selector">MNIST</Label>
+            <Switch
+              id="model-selector"
+              value={selectedModel.toString()}
+              onClick={() => {
+                clearCanvas();
+                setOutputModel(null);
+                setSelectedModel(!selectedModel);
+              }}
+            />
+            <Label htmlFor="model-selector">Quick! Draw</Label>
+          </div>
+          {selectedModel && <QuickDrawProbability outputModel={outputModel} />}
+          {!selectedModel && <MNISTProbability outputModel={outputModel} />}
+            <Button onClick={clearCanvas} variant="destructive" className="w-full">
+              <b>Elimina</b>
+            </Button>
+          <div className="space-x-2">
+            <Button disabled={outputModel == null}>
+              <ThumbsUp className="mr-2 h-4 w-4"/>
+              Corretto
+            </Button>
+            <Button disabled={outputModel == null} variant={"outline"}> 
+              <ThumbsDown className="mr-2 h-4 w-4" />
+              Sbagliato
+            </Button>
+          </div>
         </div>
       </div>
     </div>
