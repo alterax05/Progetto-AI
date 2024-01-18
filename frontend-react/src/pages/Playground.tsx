@@ -135,6 +135,13 @@ function Playground() {
     setOutputModel(null);
   };
 
+  const handleSubmit = () =>{
+    toast({title:"Grazie mille!", description: <p>Grazie per averci aiutato nella nostra ricerca! <br/> Michele e Giovanni</p>})
+
+    setOutputModel(null);
+    clearCanvas();
+  }
+
   return (
 
     <div>
@@ -169,11 +176,11 @@ function Playground() {
               <b>Elimina</b>
             </Button>
           <div className="space-x-2">
-            <Button disabled={outputModel != null} onClick={() => {toast({title:"Ciao"})}}>
+            <Button disabled={outputModel == null} onClick={handleSubmit}>
               <ThumbsUp className="mr-2 h-4 w-4"/>
               Corretto
             </Button>
-            <Button disabled={outputModel == null} variant={"outline"}> 
+            <Button disabled={outputModel == null} variant={"outline"} onClick={handleSubmit}> 
               <ThumbsDown className="mr-2 h-4 w-4" />
               Sbagliato
             </Button>
