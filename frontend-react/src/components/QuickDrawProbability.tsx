@@ -45,7 +45,7 @@ function QuickDrawProbability({outputModel}: {outputModel: Float32Array | null})
     : classes.map((value) => ({value: value, prob: 0 }));
 
   return (
-    <ScrollArea className="h-72 w-48 rounded-md border">
+    <ScrollArea className="h-72 w-full rounded-md border">
       <div className="p-4">
         <h4 className="mb-4 text-sm font-medium leading-none">Probabilità</h4>
         {predictedProbability.map((value, index) => (
