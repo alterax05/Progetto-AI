@@ -9,6 +9,7 @@ import MNISTProbability from "@/components/MNISTProbability";
 import { Switch } from "@/components/ui/switch.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
+import { useToast } from "@/components/ui/use-toast"
 
 function Playground() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -16,6 +17,8 @@ function Playground() {
   const [isDrawing, setIsDrawing] = useState(false);
   const [selectedModel, setSelectedModel] = useState(false); //False = QuickDraw, True = MNIST
   const [outputModel, setOutputModel] = useState<Float32Array | null>(null);
+
+  const { toast } = useToast();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -133,6 +136,7 @@ function Playground() {
   };
 
   return (
+
     <div>
       <h1 className="flex justify-center text-5xl m-14">
         <b>Playground</b>
@@ -165,7 +169,7 @@ function Playground() {
               <b>Elimina</b>
             </Button>
           <div className="space-x-2">
-            <Button disabled={outputModel == null}>
+            <Button disabled={outputModel != null} onClick={() => {toast({title:"Ciao"})}}>
               <ThumbsUp className="mr-2 h-4 w-4"/>
               Corretto
             </Button>

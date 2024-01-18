@@ -9,6 +9,7 @@ import GestioneProgetto from "./pages/GestioneProgetto";
 import Playground from "./pages/Playground";
 import { ChakraProvider } from "@chakra-ui/react";
 import App from "@/App.tsx";
+import { Toaster } from "@/components/ui/toaster.tsx";
 
 const router = createBrowserRouter([
   {
@@ -42,6 +43,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <ChakraProvider>
       <App>
         <RouterProvider router={router} />
+        <Toaster />
       </App>
     </ChakraProvider>
   </React.StrictMode>
