@@ -26,8 +26,8 @@ function Home() {
   const { setTheme } = useTheme();
 
   return (
-    <div className="flex flex-col h-screen items-center justify-center anim_gradient">
-      <div className="flex justify-end p-4">
+    <div className="anim_gradient">
+      <div className="absolute right-0 p-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon">
@@ -49,72 +49,74 @@ function Home() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="flex flex-row items-center justify-self-center h-screen">
-        <h1 className="text-5xl m-16">
-          <b>Progetto AI</b>
-        </h1>
-        <div className="flex items-center space-x-10">
-          <Separator orientation="vertical" className="h-[50vh] w-0.5" />
-          <Card className="hover:drop-shadow-lg">
-            <CardHeader>
-              <CardTitle>Ricerca TPSI</CardTitle>
-              <CardDescription>
-                Clicca qui per visualizzare la ricerca
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4"></CardContent>
-            <CardFooter className="flex justify-end">
-              <Link
-                to="/tpsi"
-                className={buttonVariants({
-                  variant: "default",
-                  size: "icon",
-                })}
-              >
-                <MoveRight />
-              </Link>
-            </CardFooter>
-          </Card>
-          <Card className="hover:drop-shadow-lg">
-            <CardHeader>
-              <CardTitle>Ricerca Gestione Progetto</CardTitle>
-              <CardDescription>
-                Clicca qui per visualizzare la ricerca
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4"></CardContent>
-            <CardFooter className="flex justify-end">
-              <Link
-                to="/progetto"
-                className={buttonVariants({
-                  variant: "default",
-                  size: "icon",
-                })}
-              >
-                <MoveRight />
-              </Link>
-            </CardFooter>
-          </Card>
-          <Card className="hover:drop-shadow-lg">
-            <CardHeader>
-              <CardTitle>Playground AI</CardTitle>
-              <CardDescription>
-                Clicca qui per provare l'intelligenza artificiale
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4"></CardContent>
-            <CardFooter className="flex justify-end">
-              <Link
-                to="/playground"
-                className={buttonVariants({
-                  variant: "default",
-                  size: "icon",
-                })}
-              >
-                <MoveRight />
-              </Link>
-            </CardFooter>
-          </Card>
+      <div className="flex flex-col h-screen items-center justify-center">
+        <div className="flex flex-row items-center justify-self-center h-screen">
+          <h1 className="text-5xl m-16">
+            <b>Progetto AI</b>
+          </h1>
+          <div className="flex items-center space-x-10">
+            <Separator orientation="vertical" className="h-[50vh] w-0.5" />
+            <Card className="hover:drop-shadow-lg">
+              <CardHeader>
+                <CardTitle>Ricerca TPSI</CardTitle>
+                <CardDescription>
+                  Clicca qui per visualizzare la ricerca
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-4"></CardContent>
+              <CardFooter className="flex justify-end">
+                <Link
+                  to="/tpsi"
+                  className={buttonVariants({
+                    variant: "default",
+                    size: "icon",
+                  })}
+                >
+                  <MoveRight />
+                </Link>
+              </CardFooter>
+            </Card>
+            <Card className="hover:drop-shadow-lg">
+              <CardHeader>
+                <CardTitle>Ricerca Gestione Progetto</CardTitle>
+                <CardDescription>
+                  Clicca qui per visualizzare la ricerca
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-4"></CardContent>
+              <CardFooter className="flex justify-end">
+                <Link
+                  to="/progetto"
+                  className={buttonVariants({
+                    variant: "default",
+                    size: "icon",
+                  })}
+                >
+                  <MoveRight />
+                </Link>
+              </CardFooter>
+            </Card>
+            <Card className="hover:drop-shadow-lg">
+              <CardHeader>
+                <CardTitle>Playground AI</CardTitle>
+                <CardDescription>
+                  Clicca qui per provare l'intelligenza artificiale
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-4"></CardContent>
+              <CardFooter className="flex justify-end">
+                <Link
+                  to="/playground"
+                  className={buttonVariants({
+                    variant: "default",
+                    size: "icon",
+                  })}
+                >
+                  <MoveRight />
+                </Link>
+              </CardFooter>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
