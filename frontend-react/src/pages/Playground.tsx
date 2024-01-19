@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
+import { MoveLeft } from "lucide-react";
 
 function Playground() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -160,7 +161,6 @@ function Playground() {
     clearCanvas();
     setMaxClass("");
 
-    console.log(inferenceTime)
     axios.post("/api/research", {
       model: selectedModel ? "QuickDraw": "MNIST",
       outputClass: maxClass,
@@ -174,8 +174,8 @@ function Playground() {
       <h1 className="flex justify-center text-5xl m-14">
         <b>PLAYGROUND</b>
       </h1>
-      <Button className="absolute top-5 left-5" onClick={() => {navigate('/')}}> 
-        Indietro
+      <Button className="absolute top-5 left-5" size={"icon"} onClick={() => {navigate('/')}}> 
+        <MoveLeft className="h-5 w-5" />
       </Button>
       <div className="flex flex-row items-center justify-evenly">
         <canvas
@@ -216,6 +216,7 @@ function Playground() {
             <Button
               disabled={outputModel == null}
               variant={"outline"}
+              className="text-black dark:text-white"
               onClick={() => handleSubmit(false)}
             >
               <ThumbsDown className="mr-2 h-4 w-4" />
