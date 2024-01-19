@@ -47,7 +47,7 @@ namespace Progetto_AI_API
                 db.Add(recensione);
                 db.SaveChanges();
             });
-
+            
             app.MapGet("/api/research", () =>
             {
                 return "ciao";

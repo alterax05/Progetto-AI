@@ -26,6 +26,7 @@ function MNISTProbability({
   useEffect(() => {
     setMaxClass(predictedProbability[0].key.toString())
   },[predictedProbability])
+  
   return (
     <ScrollArea className="h-72 w-full rounded-md border">
       <div className="p-4">

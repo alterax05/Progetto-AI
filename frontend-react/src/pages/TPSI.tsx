@@ -1,7 +1,5 @@
 import { Heading, VStack } from "@chakra-ui/react";
 import { Box } from "@chakra-ui/react";
-import Image from "next/image";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 function TPSI() {
   return (

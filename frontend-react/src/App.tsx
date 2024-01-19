@@ -2,7 +2,6 @@ import { ThemeProvider } from "@/components/theme-provider"
  
 import React, { ReactNode } from 'react';
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useNavigate, useLocation } from "react-router-dom";
 import ErrorPage from "./pages/ErrorPage";
 import TPSI from "./pages/TPSI";
 import Playground from "./pages/Playground";

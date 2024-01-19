@@ -43,7 +43,7 @@ function Playground() {
   }, []);
 
   const inferenceSession = async () => {
-    let model: string = selectedModel ? modelQuickDrawUrl : modelNMNISTDigitUrl;
+    const model: string = selectedModel ? modelQuickDrawUrl : modelNMNISTDigitUrl;
     return InferenceSession.create(model, {
       executionProviders: ["webgl"],
     });
