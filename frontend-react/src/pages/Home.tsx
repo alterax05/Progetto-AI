@@ -78,26 +78,6 @@ function Home() {
             </Card>
             <Card className="hover:drop-shadow-lg">
               <CardHeader>
-                <CardTitle>Ricerca Gestione Progetto</CardTitle>
-                <CardDescription>
-                  Clicca qui per visualizzare la ricerca
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-4"></CardContent>
-              <CardFooter className="flex justify-end">
-                <Link
-                  to="/progetto"
-                  className={buttonVariants({
-                    variant: "default",
-                    size: "icon",
-                  })}
-                >
-                  <MoveRight />
-                </Link>
-              </CardFooter>
-            </Card>
-            <Card className="hover:drop-shadow-lg">
-              <CardHeader>
                 <CardTitle>Playground AI</CardTitle>
                 <CardDescription>
                   Clicca qui per provare l'intelligenza artificiale

@@ -1,11 +1,12 @@
 import { ScrollArea } from "@/components/ui/scroll-area.tsx";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator.tsx";
+import { useEffect } from "react";
 
 function MNISTProbability({
-  outputModel,
+  outputModel,setMaxClass
 }: {
-  outputModel: Float32Array | null;
+  outputModel: Float32Array | null; setMaxClass: React.Dispatch<React.SetStateAction<string>>
 }) {
 
   const predictedProbability = outputModel
@@ -22,6 +23,9 @@ function MNISTProbability({
     })
     : Array(10).fill(10).map((_, index) => ({ key: index, value: 0 }));
 
+  useEffect(() => {
+    setMaxClass(predictedProbability[0].key.toString())
+  },[predictedProbability])
   return (
     <ScrollArea className="h-72 w-full rounded-md border">
       <div className="p-4">

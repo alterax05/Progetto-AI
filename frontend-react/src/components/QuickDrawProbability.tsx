@@ -1,8 +1,9 @@
 import { ScrollArea } from "@/components/ui/scroll-area.tsx";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator.tsx";
+import { useEffect } from "react";
 
-function QuickDrawProbability({outputModel}: {outputModel: Float32Array | null}) {
+function QuickDrawProbability({outputModel, setMaxClass}: {outputModel: Float32Array | null, setMaxClass: React.Dispatch<React.SetStateAction<string>>}) {
   const classes = [
     'Torre Eiffel',
     'Aereo',
@@ -26,6 +27,7 @@ function QuickDrawProbability({outputModel}: {outputModel: Float32Array | null})
     'Triangolo',
   ]
 
+
   const predictedProbability = outputModel
     ? [...outputModel]
         .map((value, index) => ({
@@ -43,6 +45,11 @@ function QuickDrawProbability({outputModel}: {outputModel: Float32Array | null})
           };
         })
     : classes.map((value) => ({value: value, prob: 0 }));
+
+    
+  useEffect(() => {
+    setMaxClass(predictedProbability[0].value)
+  },[predictedProbability])
 
   return (
     <ScrollArea className="h-72 w-full rounded-md border">

@@ -8,8 +8,9 @@ import QuickDrawProbability from "@/components/QuickDrawProbability";
 import MNISTProbability from "@/components/MNISTProbability";
 import { Switch } from "@/components/ui/switch.tsx";
 import { Label } from "@/components/ui/label.tsx";
-import { ThumbsUp, ThumbsDown } from 'lucide-react';
-import { useToast } from "@/components/ui/use-toast"
+import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import axios from "axios";
 
 function Playground() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -17,6 +18,8 @@ function Playground() {
   const [isDrawing, setIsDrawing] = useState(false);
   const [selectedModel, setSelectedModel] = useState(false); //False = QuickDraw, True = MNIST
   const [outputModel, setOutputModel] = useState<Float32Array | null>(null);
+  const [maxClass, setMaxClass] = useState<string>(""); 
+  const [inferenceTime, setInferenceTime] = useState<number>(0);
 
   const { toast } = useToast();
 
@@ -87,12 +90,17 @@ function Playground() {
       );
 
       const input = imageDataToTensor(resizeImageData, [1, 1, 28, 28]);
+      const startTime = performance.now();
+
       const session = await inferenceSession();
       const feeds: Record<string, Tensor> = {};
       feeds[session.inputNames[0]] = input;
       const outputMap = await session.run(feeds);
       const outputTensor = outputMap[session.outputNames[0]];
       setOutputModel(outputTensor.data as Float32Array);
+
+      const endTime = performance.now();
+      setInferenceTime(endTime - startTime);
     }
   };
 
@@ -133,17 +141,33 @@ function Playground() {
       context.clearRect(0, 0, canvas.width, canvas.height);
     }
     setOutputModel(null);
+    setMaxClass("");
   };
 
-  const handleSubmit = () =>{
-    toast({title:"Grazie mille!", description: <p>Grazie per averci aiutato nella nostra ricerca! <br/> Michele e Giovanni</p>})
-
+  const handleSubmit = (correct: boolean) => {
+    toast({
+      title: "Grazie mille!",
+      description: (
+        <p>
+          Grazie per averci aiutato nella nostra ricerca! <br /> Michele e
+          Giovanni
+        </p>
+      ),
+    });
     setOutputModel(null);
     clearCanvas();
-  }
+    setMaxClass("");
+
+    console.log(inferenceTime)
+    axios.post("/api/research", {
+      model: selectedModel ? "QuickDraw": "MNIST",
+      outputClass: maxClass,
+      correct: correct,
+      elapsedTime: inferenceTime.toFixed(0),
+    });
+  };
 
   return (
-
     <div>
       <h1 className="flex justify-center text-5xl m-14">
         <b>Playground</b>
@@ -170,17 +194,25 @@ function Playground() {
             />
             <Label htmlFor="model-selector">Quick! Draw</Label>
           </div>
-          {selectedModel && <QuickDrawProbability outputModel={outputModel} />}
-          {!selectedModel && <MNISTProbability outputModel={outputModel} />}
-            <Button onClick={clearCanvas} variant="destructive" className="w-full">
-              <b>Elimina</b>
-            </Button>
+          {selectedModel && <QuickDrawProbability outputModel={outputModel} setMaxClass={setMaxClass} />}
+          {!selectedModel && <MNISTProbability outputModel={outputModel} setMaxClass={setMaxClass}/>}
+          <Button
+            onClick={clearCanvas}
+            variant="destructive"
+            className="w-full"
+          >
+            <b>Elimina</b>
+          </Button>
           <div className="space-x-2">
-            <Button disabled={outputModel == null} onClick={handleSubmit}>
-              <ThumbsUp className="mr-2 h-4 w-4"/>
+            <Button disabled={outputModel == null} onClick={() => handleSubmit(true)}>
+              <ThumbsUp className="mr-2 h-4 w-4" />
               Corretto
             </Button>
-            <Button disabled={outputModel == null} variant={"outline"} onClick={handleSubmit}> 
+            <Button
+              disabled={outputModel == null}
+              variant={"outline"}
+              onClick={() => handleSubmit(false)}
+            >
               <ThumbsDown className="mr-2 h-4 w-4" />
               Sbagliato
             </Button>
