@@ -170,7 +170,6 @@ function Playground() {
   };
 
   return (
-    <div>
     <div className="flex flex-col h-screen anim_gradient text-white">
       <h1 className="flex justify-center text-5xl m-14">
         <b>PLAYGROUND</b>

@@ -1,7 +1,5 @@
 // TPSI.jsx
-import React from 'react';
 import { Heading, VStack, Box, Text, Link } from "@chakra-ui/react";
-import { Button } from "@/components/ui/button";
 
 function TPSI() {
   return (
