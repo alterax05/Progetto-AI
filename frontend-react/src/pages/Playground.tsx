@@ -1,33 +1,37 @@
 import { InferenceSession, Tensor } from "onnxruntime-web";
-
 import { Button } from "@/components/ui/button.tsx";
-
-import { Progress } from "@/components/ui/progress"
-
-import { ScrollArea } from "@/components/ui/scroll-area.tsx";
-
-import { Separator } from "@/components/ui/separator.tsx";
-
 import { useRef, useEffect, useState, MouseEvent } from "react";
-
 import pica from "pica";
+import modelQuickDrawUrl from "../../../modello-ai/QuickDraw-drawing-recognition/model.onnx?url";
+import modelNMNISTDigitUrl from "../../../modello-ai/MNIST-digit-recognition/model.onnx?url";
+import QuickDrawProbability from "@/components/QuickDrawProbability";
+import MNISTProbability from "@/components/MNISTProbability";
+import { Switch } from "@/components/ui/switch.tsx";
+import { Label } from "@/components/ui/label.tsx";
+import { useNavigate } from "react-router-dom";
+import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import axios from "axios";
 
 function Playground() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
-
   const [isDrawing, setIsDrawing] = useState(false);
-  const [predictedProbability, setPredictedProbability] = useState<
-    { key: number; value: number }[]
-  >(Array(10).fill({ key: 0, value: 0 }).map((value, index) => ({ key: index, value: 0 })));
+  const [selectedModel, setSelectedModel] = useState(false); //False = QuickDraw, True = MNIST
+  const [outputModel, setOutputModel] = useState<Float32Array | null>(null);
+  const [maxClass, setMaxClass] = useState<string>(""); 
+  const [inferenceTime, setInferenceTime] = useState<number>(0);
+
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
-      canvas.width = 400;
-      canvas.height = 400;
-      canvas.style.width = "400px";
-      canvas.style.height = "400px";
+      canvas.width = 500;
+      canvas.height = 500;
+      canvas.style.width = "500px";
+      canvas.style.height = "500px";
 
       const context = canvas.getContext("2d", { willReadFrequently: true });
       if (context) {
@@ -41,9 +45,9 @@ function Playground() {
   }, []);
 
   const inferenceSession = async () => {
-    return await InferenceSession.create("/model.onnx", {
+    const model: string = selectedModel ? modelQuickDrawUrl : modelNMNISTDigitUrl;
+    return InferenceSession.create(model, {
       executionProviders: ["webgl"],
-      graphOptimizationLevel: "all",
     });
   };
 
@@ -88,25 +92,17 @@ function Playground() {
       );
 
       const input = imageDataToTensor(resizeImageData, [1, 1, 28, 28]);
+      const startTime = performance.now();
+
       const session = await inferenceSession();
       const feeds: Record<string, Tensor> = {};
       feeds[session.inputNames[0]] = input;
       const outputMap = await session.run(feeds);
       const outputTensor = outputMap[session.outputNames[0]];
-      const outputData = outputTensor.data as Float32Array;
-      setPredictedProbability(
-        [...outputData]
-          .map((value, index) => ({ key: index, value: value }))
-          .sort((a, b) => b.value - a.value)
-          .map((value, _ , array) => {
-            return {
-              key: value.key,
-              value:
-                ((value.value - array[array.length - 1].value) /
-                (array[0].value - array[array.length - 1].value) * 100),
-            };
-          })
-      );
+      setOutputModel(outputTensor.data as Float32Array);
+
+      const endTime = performance.now();
+      setInferenceTime(endTime - startTime);
     }
   };
 
@@ -146,14 +142,41 @@ function Playground() {
     if (context && canvas) {
       context.clearRect(0, 0, canvas.width, canvas.height);
     }
-    setPredictedProbability(Array(10).fill({ key: 0, value: 0 }).map((_, index) => ({ key: index, value: 0 })));
+    setOutputModel(null);
+    setMaxClass("");
+  };
+
+  const handleSubmit = (correct: boolean) => {
+    toast({
+      title: "Grazie mille!",
+      description: (
+        <p>
+          Grazie per averci aiutato nella nostra ricerca! <br /> Michele e
+          Giovanni
+        </p>
+      ),
+    });
+    setOutputModel(null);
+    clearCanvas();
+    setMaxClass("");
+
+    console.log(inferenceTime)
+    axios.post("/api/research", {
+      model: selectedModel ? "QuickDraw": "MNIST",
+      outputClass: maxClass,
+      correct: correct,
+      elapsedTime: inferenceTime.toFixed(0),
+    });
   };
 
   return (
-    <div>
-      <h1 className="flex justify-center text-5xl m-16">
-        <b>Playground</b>
+    <div className="flex flex-col h-screen anim_gradient text-white">
+      <h1 className="flex justify-center text-5xl m-14">
+        <b>PLAYGROUND</b>
       </h1>
+      <Button className="absolute top-5 left-5" onClick={() => {navigate('/')}}> 
+        Indietro
+      </Button>
       <div className="flex flex-row items-center justify-evenly">
         <canvas
           onMouseDown={startDrawing}
@@ -163,30 +186,42 @@ function Playground() {
           className="bg-slate-200 rounded-md"
         />
         <div className="flex flex-col items-center justify-center space-y-5">
-          {(
-            <ScrollArea className="h-72 w-48 rounded-md border">
-              <div className="p-4">
-                <h4 className="mb-4 text-sm font-medium leading-none">
-                  Probabilità
-                </h4>
-                {predictedProbability.map((value, index) => (
-                  <>
-                    <div key={index} className="text-sm">
-                      <b>{value.key.toString()}</b>:{" "}
-                      {value.value.toFixed(2).toString()}
-                      <Progress
-                        className="w-full h-2 mt-2 rounded-md"
-                        value={value.value}/>
-                    </div>
-                    <Separator className="my-2" />
-                  </>
-                ))}
-              </div>
-            </ScrollArea>
-          )}
-          <Button onClick={clearCanvas} variant="destructive">
+          <div className="flex items-center space-x-2">
+            <Label htmlFor="model-selector">MNIST</Label>
+            <Switch
+              id="model-selector"
+              value={selectedModel.toString()}
+              onClick={() => {
+                clearCanvas();
+                setOutputModel(null);
+                setSelectedModel(!selectedModel);
+              }}
+            />
+            <Label htmlFor="model-selector">Quick! Draw</Label>
+          </div>
+          {selectedModel && <QuickDrawProbability outputModel={outputModel} setMaxClass={setMaxClass} />}
+          {!selectedModel && <MNISTProbability outputModel={outputModel} setMaxClass={setMaxClass}/>}
+          <Button
+            onClick={clearCanvas}
+            variant="destructive"
+            className="w-full"
+          >
             <b>Elimina</b>
           </Button>
+          <div className="space-x-2">
+            <Button disabled={outputModel == null} onClick={() => handleSubmit(true)}>
+              <ThumbsUp className="mr-2 h-4 w-4" />
+              Corretto
+            </Button>
+            <Button
+              disabled={outputModel == null}
+              variant={"outline"}
+              onClick={() => handleSubmit(false)}
+            >
+              <ThumbsDown className="mr-2 h-4 w-4" />
+              Sbagliato
+            </Button>
+          </div>
         </div>
       </div>
     </div>
