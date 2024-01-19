@@ -47,23 +47,6 @@ function TPSI() {
             Il dataset di <Link href="https://quickdraw.withgoogle.com/" isExternal color="teal.300">Quick, Draw!</Link> è stato utilizzato per addestrare entrambi i modelli. Quick, Draw! è un progetto di Google che offre un vasto dataset di schizzi di disegni fatti dagli utenti in tempo reale. Questo dataset diversificato contribuisce alla robustezza e all'efficacia dei modelli nell'affrontare una vasta gamma di situazioni.
           </Text>
         </Box>
-        <Box>
-          <Heading as="h2" size="xl" mb={4}>
-            Download dei Modelli
-          </Heading>
-          <VStack spacing={4}>
-            <Link href="/models/drawing-detection.zip" isExternal>
-              <Button variant="outline">
-                Modello di Individuazione di Disegni
-              </Button>
-            </Link>
-            <Link href="/models/number-recognition.zip" isExternal>
-              <Button variant="outline">
-                Modello di Riconoscimento di Numeri
-              </Button>
-            </Link>
-          </VStack>
-        </Box>
       </VStack>
     </div>
   );
