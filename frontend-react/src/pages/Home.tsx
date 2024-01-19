@@ -59,8 +59,8 @@ function Home() {
       <div className="flex flex-col h-screen items-center justify-center">
         <div className="flex flex-row items-center justify-self-center h-screen">
           <h1 className="text-5xl m-16 fixed left-0">
-            <span style={{ fontWeight: "bold", color: "black" }}>{text}</span>
-            <span style={{ color: "red" }}>
+            <span style={{ fontWeight: "bold", color: "white" }}>{text}</span>
+            <span style={{ color: "#EFE7DA" }}>
               <Cursor cursorStyle="<" />
             </span>
           </h1>

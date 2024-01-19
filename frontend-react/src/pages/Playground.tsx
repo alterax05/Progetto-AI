@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 function Playground() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -19,6 +20,7 @@ function Playground() {
   const [outputModel, setOutputModel] = useState<Float32Array | null>(null);
 
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -151,15 +153,11 @@ function Playground() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-r from-purple-500 to-indigo-500 text-white">
+    <div className="flex flex-col h-screen anim_gradient text-white">
       <h1 className="flex justify-center text-5xl m-14">
         <b>PLAYGROUND</b>
       </h1>
-      <Button
-        className="absolute top-5 left-5"
-        disabled={outputModel == null}
-        onClick={handleSubmit}
-      >
+      <Button className="absolute top-5 left-5" onClick={() => {navigate('/')}}> 
         Indietro
       </Button>
       <div className="flex flex-row items-center justify-evenly">

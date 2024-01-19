@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 function TPSI() {
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-purple-500 to-indigo-500 text-white">
+    <div className="flex flex-col items-center justify-center anim_gradient text-white">
       <VStack width="100%" spacing={8} align="center" justify="center" p={8}>
         <Heading as="h1" size="3xl" textAlign="center">
           PROGETTO TPSI: Riconoscimento di Disegni e Numeri
