@@ -8,8 +8,9 @@ import QuickDrawProbability from "@/components/QuickDrawProbability";
 import MNISTProbability from "@/components/MNISTProbability";
 import { Switch } from "@/components/ui/switch.tsx";
 import { Label } from "@/components/ui/label.tsx";
-import { ThumbsUp, ThumbsDown } from 'lucide-react';
-import { useToast } from "@/components/ui/use-toast"
+import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 function Playground() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -19,6 +20,7 @@ function Playground() {
   const [outputModel, setOutputModel] = useState<Float32Array | null>(null);
 
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -135,19 +137,29 @@ function Playground() {
     setOutputModel(null);
   };
 
-  const handleSubmit = () =>{
-    toast({title:"Grazie mille!", description: <p>Grazie per averci aiutato nella nostra ricerca! <br/> Michele e Giovanni</p>})
+  const handleSubmit = () => {
+    toast({
+      title: "Grazie mille!",
+      description: (
+        <p>
+          Grazie per averci aiutato nella nostra ricerca! <br /> Michele e
+          Giovanni
+        </p>
+      ),
+    });
 
     setOutputModel(null);
     clearCanvas();
-  }
+  };
 
   return (
-
-    <div>
+    <div className="flex flex-col h-screen anim_gradient text-white">
       <h1 className="flex justify-center text-5xl m-14">
-        <b>Playground</b>
+        <b>PLAYGROUND</b>
       </h1>
+      <Button className="absolute top-5 left-5" onClick={() => {navigate('/')}}> 
+        Indietro
+      </Button>
       <div className="flex flex-row items-center justify-evenly">
         <canvas
           onMouseDown={startDrawing}
@@ -172,15 +184,19 @@ function Playground() {
           </div>
           {selectedModel && <QuickDrawProbability outputModel={outputModel} />}
           {!selectedModel && <MNISTProbability outputModel={outputModel} />}
-            <Button onClick={clearCanvas} variant="destructive" className="w-full">
-              <b>Elimina</b>
-            </Button>
+          <Button
+            onClick={clearCanvas}
+            variant="destructive"
+            className="w-full"
+          >
+            <b>Elimina</b>
+          </Button>
           <div className="space-x-2">
             <Button disabled={outputModel == null} onClick={handleSubmit}>
-              <ThumbsUp className="mr-2 h-4 w-4"/>
+              <ThumbsUp className="mr-2 h-4 w-4" />
               Corretto
             </Button>
-            <Button disabled={outputModel == null} variant={"outline"} onClick={handleSubmit}> 
+            <Button disabled={outputModel == null} onClick={handleSubmit}>
               <ThumbsDown className="mr-2 h-4 w-4" />
               Sbagliato
             </Button>

@@ -5,14 +5,14 @@ import { Button } from "@/components/ui/button";
 
 function TPSI() {
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-purple-500 to-indigo-500 text-white">
+    <div className="flex flex-col items-center justify-center anim_gradient text-white">
       <VStack width="100%" spacing={8} align="center" justify="center" p={8}>
-        <Heading as="h1" size="4xl" textAlign="center">
+        <Heading as="h1" size="3xl" textAlign="center">
           PROGETTO TPSI: Riconoscimento di Disegni e Numeri
         </Heading>
         <Box p={4} bg="rgba(255, 255, 255, 0.3)" borderRadius="md" boxShadow="lg" textAlign="center">
           <Text>
-            In questo progetto, ho sviluppato due intelligenze artificiali (AI) in grado di riconoscere disegni e numeri.
+            In questo progetto sono state sviluppate due intelligenze artificiali (AI) in grado di riconoscere disegni e numeri.
             La prima AI utilizza un modello di apprendimento profondo basato su <Link href="https://pytorch.org/" isExternal color="teal.300">PyTorch</Link> per identificare e classificare diverse forme geometriche e linee.
             La seconda AI utilizza un modello di riconoscimento di caratteri ottici (OCR) basato su PyTorch per riconoscere i numeri.
           </Text>
@@ -46,23 +46,6 @@ function TPSI() {
           <Text mt={4}>
             Il dataset di <Link href="https://quickdraw.withgoogle.com/" isExternal color="teal.300">Quick, Draw!</Link> è stato utilizzato per addestrare entrambi i modelli. Quick, Draw! è un progetto di Google che offre un vasto dataset di schizzi di disegni fatti dagli utenti in tempo reale. Questo dataset diversificato contribuisce alla robustezza e all'efficacia dei modelli nell'affrontare una vasta gamma di situazioni.
           </Text>
-        </Box>
-        <Box>
-          <Heading as="h2" size="xl" mb={4}>
-            Download dei Modelli
-          </Heading>
-          <VStack spacing={4}>
-            <Link href="/models/drawing-detection.zip" isExternal>
-              <Button variant="outline">
-                Modello di Individuazione di Disegni
-              </Button>
-            </Link>
-            <Link href="/models/number-recognition.zip" isExternal>
-              <Button variant="outline">
-                Modello di Riconoscimento di Numeri
-              </Button>
-            </Link>
-          </VStack>
         </Box>
       </VStack>
     </div>

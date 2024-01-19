@@ -21,10 +21,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTheme } from "@/components/theme-provider";
+import { useTypewriter, Cursor } from "react-simple-typewriter";
 
 function Home() {
   const { setTheme } = useTheme();
-
+  const [text] = useTypewriter({
+    words: ["Progetto", "Intelligenza", "Artificiale"],
+    loop: false,
+    typeSpeed: 120,
+    delaySpeed:80,
+  });
+  
   return (
     <div className="anim_gradient">
       <div className="absolute right-0 p-4">
@@ -51,11 +58,14 @@ function Home() {
       </div>
       <div className="flex flex-col h-screen items-center justify-center">
         <div className="flex flex-row items-center justify-self-center h-screen">
-          <h1 className="text-5xl m-16">
-            <b>Progetto AI</b>
+          <h1 className="text-5xl m-16 fixed left-0">
+            <span style={{ fontWeight: "bold", color: "white" }}>{text}</span>
+            <span style={{ color: "#EFE7DA" }}>
+              <Cursor cursorStyle="<" />
+            </span>
           </h1>
-          <div className="flex items-center space-x-10">
-            <Separator orientation="vertical" className="h-[50vh] w-0.5" />
+          <div className="flex items-center space-x-10 fixed right-10">
+            <Separator orientation="vertical" className="h-[50vh] w-0.5 absolute"/>
             <Card className="hover:drop-shadow-lg">
               <CardHeader>
                 <CardTitle>Ricerca TPSI</CardTitle>
