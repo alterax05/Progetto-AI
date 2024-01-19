@@ -12,7 +12,7 @@ function TPSI() {
         </Heading>
         <Box p={4} bg="rgba(255, 255, 255, 0.3)" borderRadius="md" boxShadow="lg" textAlign="center">
           <Text>
-            In questo progetto, ho sviluppato due intelligenze artificiali (AI) in grado di riconoscere disegni e numeri.
+            In questo progetto sono state sviluppate due intelligenze artificiali (AI) in grado di riconoscere disegni e numeri.
             La prima AI utilizza un modello di apprendimento profondo basato su <Link href="https://pytorch.org/" isExternal color="teal.300">PyTorch</Link> per identificare e classificare diverse forme geometriche e linee.
             La seconda AI utilizza un modello di riconoscimento di caratteri ottici (OCR) basato su PyTorch per riconoscere i numeri.
           </Text>
