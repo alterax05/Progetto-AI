@@ -58,13 +58,13 @@ function Home() {
       </div>
       <div className="flex flex-col h-screen items-center justify-center">
         <div className="flex flex-row items-center justify-self-center h-screen">
-          <h1 className="text-5xl m-16 fixed left-0">
+          <h1 className="text-5xl m-16 fixed left-20">
             <span style={{ fontWeight: "bold", color: "white" }}>{text}</span>
             <span style={{ color: "#EFE7DA" }}>
               <Cursor cursorStyle="<" />
             </span>
           </h1>
-          <div className="flex items-center space-x-10 fixed right-10">
+          <div className="flex items-center space-x-10 fixed right-45">
             <Separator orientation="vertical" className="h-[50vh] w-0.5 absolute"/>
             <Card className="hover:drop-shadow-lg">
               <CardHeader>
