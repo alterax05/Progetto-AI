@@ -8,6 +8,7 @@ import QuickDrawProbability from "@/components/QuickDrawProbability";
 import MNISTProbability from "@/components/MNISTProbability";
 import { Switch } from "@/components/ui/switch.tsx";
 import { Label } from "@/components/ui/label.tsx";
+import { useNavigate } from "react-router-dom";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
@@ -22,6 +23,7 @@ function Playground() {
   const [inferenceTime, setInferenceTime] = useState<number>(0);
 
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -169,9 +171,13 @@ function Playground() {
 
   return (
     <div>
+    <div className="flex flex-col h-screen anim_gradient text-white">
       <h1 className="flex justify-center text-5xl m-14">
-        <b>Playground</b>
+        <b>PLAYGROUND</b>
       </h1>
+      <Button className="absolute top-5 left-5" onClick={() => {navigate('/')}}> 
+        Indietro
+      </Button>
       <div className="flex flex-row items-center justify-evenly">
         <canvas
           onMouseDown={startDrawing}
