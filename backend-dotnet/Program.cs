@@ -47,10 +47,10 @@ namespace Progetto_AI_API
                 db.Add(recensione);
                 db.SaveChanges();
             });
-            
-            app.MapGet("/api/research", () =>
+
+            app.MapGet("/api/research", (ProgettoAIDbContext db) =>
             {
-                return "ciao";
+                return db.RecensioniUtenti?.ToList() ;
             });
 
             app.Run();
