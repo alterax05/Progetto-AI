@@ -88,21 +88,18 @@ namespace Progetto_AI_API
 
             app.MapGet("api/research/comparison-between-models", (ProgettoAIDbContext db) =>
             {
-
+                string[] models = db.RecensioniUtenti?.Select(x => x.Model).Distinct().ToArray() ?? [];
+                List<ComparisonModels> comparisons = [];
+                foreach(var model in models)
+                {
+                    int total = db.RecensioniUtenti?.Count(x => x.Model == model) ?? 0;
+                    int correct = db.RecensioniUtenti?.Count(x=> x.Model == model && x.Correct == true) ?? 0;
+                    comparisons.Add(new ComparisonModels() { correct = correct, label=model, total=total });
+                }
+                return comparisons;
             });
 
             app.Run();
-        }
-        public class RelationTimeCorrectness
-        {
-            public double CorrelationValue { get; set; }
-            public List<TimeCorrectness> TimeCorrectness { get; set; } = new List<TimeCorrectness>();
-
-        }
-        public class TimeCorrectness
-        {
-            public int Time { get; set; }
-            public bool Correctness { get; set; }
         }
     }
 }
