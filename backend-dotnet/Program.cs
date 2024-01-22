@@ -50,10 +50,59 @@ namespace Progetto_AI_API
 
             app.MapGet("/api/research", (ProgettoAIDbContext db) =>
             {
-                return db.RecensioniUtenti?.ToList() ;
+                return db.RecensioniUtenti?.ToList();
+            });
+
+            app.MapGet("/api/research/relation-time-correctness", (ProgettoAIDbContext db) =>
+            {
+                List<RecensioneUtente> reviews = db.RecensioniUtenti?.ToList() ?? [];
+
+                var relationTimeCorrectness = new RelationTimeCorrectness();
+
+                var n = reviews.Count;
+                var n1 = reviews.Count(r => r.Correct);
+                var n2 = n - n1;
+
+                var mean1 = reviews.Where(r => r.Correct).Average(r => r.ElapsedTime);
+                var mean2 = reviews.Where(r => !r.Correct).Average(r => r.ElapsedTime);
+
+                var mean = reviews.Average(r => r.ElapsedTime);
+
+                var sumOfSquares = reviews.Sum(r => Math.Pow(r.ElapsedTime - mean, 2));
+                var standardDeviation = Math.Sqrt(sumOfSquares / (n - 1));
+
+                var pointBiserial = (mean1 - mean2) / standardDeviation * Math.Sqrt(n1 * n2 / Math.Pow(n, 2));
+                
+                relationTimeCorrectness.CorrelationValue = pointBiserial;
+                
+                reviews.Select(r => r.ElapsedTime).Distinct().ToList().ForEach(time =>
+                {
+                    var timeCorrectness = new TimeCorrectness();
+                    timeCorrectness.Time = time;
+                    timeCorrectness.Correctness = reviews.Where(r => r.ElapsedTime == time).All(r => r.Correct);
+                    relationTimeCorrectness.TimeCorrectness.Add(timeCorrectness);
+                });
+
+                return relationTimeCorrectness;
+            });
+
+            app.MapGet("api/research/comparison-between-models", (ProgettoAIDbContext db) =>
+            {
+
             });
 
             app.Run();
+        }
+        public class RelationTimeCorrectness
+        {
+            public double CorrelationValue { get; set; }
+            public List<TimeCorrectness> TimeCorrectness { get; set; } = new List<TimeCorrectness>();
+
+        }
+        public class TimeCorrectness
+        {
+            public int Time { get; set; }
+            public bool Correctness { get; set; }
         }
     }
 }

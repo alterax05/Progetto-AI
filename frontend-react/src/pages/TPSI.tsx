@@ -40,7 +40,7 @@ function TPSI() {
             Descrizione dei Modelli AI
           </Heading>
           <Box mb={8}>
-            <Text>
+            <Text mb={4}>
               <strong>
                 Modello di apprendimento profondo per l'individuazione di
                 disegni:
@@ -63,7 +63,7 @@ function TPSI() {
             </Link>
           </Box>
           <Box>
-            <Text>
+            <Text mb={4}>
               <strong>Modello OCR per il riconoscimento di numeri:</strong>{" "}
               Questo modello è stato addestrato su un dataset di immagini di
               numeri scritti a mano in diversi font e stili. (MNIST) Il modello
@@ -71,7 +71,8 @@ function TPSI() {
               L'accuratezza di riconoscimento del modello è superiore al 95%.
               Qui sotto è possibile visualizzare il notebook di Google Colab
               utilizzato per addestrare il modello.
-              <Link
+            </Text>
+            <Link
                 href="https://colab.research.google.com/github/alterax05/Progetto-AI/blob/master/modello-ai/MNIST-digit-recognition/train-model.ipynb"
                 target="_blank"
               >
@@ -80,7 +81,6 @@ function TPSI() {
                   alt="Open In Colab"
                 />
               </Link>
-            </Text>
           </Box>
         </Box>
         <Box>
