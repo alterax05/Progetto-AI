@@ -1,10 +1,80 @@
 // TPSI.jsx
 import { Heading, VStack, Box, Text, Link, Image } from "@chakra-ui/react";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { useEffect } from "react";
+import { useState } from "react";
+import { Bar, Chart } from "react-chartjs-2";
+
+interface DataGraphComparison {
+  label: string;
+  total: number;
+  correct: number;
+}
 
 function TPSI() {
+  let [dataGraphComparison, setDataGraphComparison] = useState<
+    DataGraphComparison[]
+  >([]);
+
+  useEffect(() => {
+    fetch("/api/research/comparison-between-models")
+      .then((response) => response.json())
+      .then((data) => setDataGraphComparison(data));
+  }, []);
+
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend
+  );
+
+  ChartJS.defaults.color = "white";
+
+  let DataGraphComparisonComponent = () => {
+    const data = {
+      labels: dataGraphComparison.map((info) => info.label),
+      datasets: [
+        {
+          label: "Total",
+          data: dataGraphComparison.map((info) => info.total),
+          backgroundColor: "rgb(255, 99, 132, 1)",
+        },
+        {
+          label: "Correct",
+          data: dataGraphComparison.map((info) => info.correct),
+          backgroundColor: "rgb(54, 162, 235, 1)",
+        },
+      ],
+    };
+    const options = {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: "top" as const,
+        },
+        title: {
+          display: true,
+          text: "Confronto tra i modelli AI",
+        },
+      },
+    };
+    return <Bar options={options} data={data} />;
+  };
+
   return (
     <div className="flex flex-col items-center min-h-screen justify-center anim_gradient text-white">
-      <VStack width="100%" spacing={8} align="center" justify="center" p={8}>
+      <VStack width="80%" spacing={8} align="center" justify="center" p={8}>
         <Heading as="h1" size="2xl" textAlign="center">
           Progetto TPSI: Riconoscimento di Disegni e Numeri
         </Heading>
@@ -73,14 +143,14 @@ function TPSI() {
               utilizzato per addestrare il modello.
             </Text>
             <Link
-                href="https://colab.research.google.com/github/alterax05/Progetto-AI/blob/master/modello-ai/MNIST-digit-recognition/train-model.ipynb"
-                target="_blank"
-              >
-                <Image
-                  src="https://colab.research.google.com/assets/colab-badge.svg"
-                  alt="Open In Colab"
-                />
-              </Link>
+              href="https://colab.research.google.com/github/alterax05/Progetto-AI/blob/master/modello-ai/MNIST-digit-recognition/train-model.ipynb"
+              target="_blank"
+            >
+              <Image
+                src="https://colab.research.google.com/assets/colab-badge.svg"
+                alt="Open In Colab"
+              />
+            </Link>
           </Box>
         </Box>
         <Box>
@@ -135,6 +205,24 @@ function TPSI() {
             learning from human feedback).
           </Text>
         </Box>
+        <Heading as="h2" size="xl" mb={4}>
+          Grafici
+        </Heading>
+        <div className="w-1/2">
+          <DataGraphComparisonComponent />
+        </div>
+        <Text>
+          Percentuale di successo di MNIST:{" "}
+          {(DataGraphComparisonComponent().props.data.datasets[1].data[0] /
+            DataGraphComparisonComponent().props.data.datasets[0].data[0]) *
+            100}
+          % <br />
+          Percentuale di successo di Quick, Draw!:{" "}
+          {(DataGraphComparisonComponent().props.data.datasets[1].data[1] /
+            DataGraphComparisonComponent().props.data.datasets[0].data[1]) *
+            100}
+          %
+        </Text>
         <Box>
           <Text>
             <b>Michele Porcellato e Giovanni De Quattro</b>
