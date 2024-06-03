@@ -13,3 +13,9 @@
       background-position: 0% 50%;
     }
   }
+  
+  .anim_gradient {
+    background: linear-gradient(19deg, #edddc5 20%, #113537 40%, #37505C 60% , #B07156 80%, #C57B57 100%);
+    background-size: 400% 400%;
+    animation: gradient 25s ease infinite;
+  }

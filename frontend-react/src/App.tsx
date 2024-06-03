@@ -1,30 +1,30 @@
-import { ThemeProvider } from "@/components/theme-provider"
- 
-import React, { ReactNode } from 'react';
-import { Routes, Route, Navigate } from "react-router-dom";
-import ErrorPage from "./pages/ErrorPage";
-import TPSI from "./pages/TPSI";
-import Playground from "./pages/Playground";
-import Home from "@/pages/Home.tsx";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { Suspense, lazy } from 'react';
+import { Routes, Route, Navigate, BrowserRouter as Router } from "react-router-dom";
+import Loading from "@/pages/Loading";
+import { Toaster } from "@/components/ui/toaster.tsx";
 
-interface AppProps {
-  children?: ReactNode; // 'children' is optional and can be any valid React node
-}
+const Playground = lazy(() => import("@/pages/Playground"));
+const TPSI = lazy(() => import("@/pages/TPSI"));
+const ErrorPage = lazy(() => import("@/pages/ErrorPage"));
+const Home = lazy(() => import("@/pages/Home"));
 
-const App: React.FC<AppProps> = ({ children }) => {
-
-  
-
-  return (<ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/playground" element={<Playground />} />
-        <Route path="/tpsi" element={<TPSI />} />
-        <Route path="/404" element={<ErrorPage />} />
-        <Route path="*" element={<Navigate to="/404" />} />
-      </Routes>
-    {children}
-  </ThemeProvider>
-)};
+const App = () => {
+  return (
+    <Router>
+      <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+        <Suspense fallback={<Loading />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/playground" element={<Playground />} />
+            <Route path="/tpsi" element={<TPSI />} />
+            <Route path="/404" element={<ErrorPage />} />
+            <Route path="*" element={<Navigate to="/404" />} />
+          </Routes>
+          <Toaster />
+        </Suspense>
+      </ThemeProvider>
+    </Router>
+  )};
 
 export default App;
