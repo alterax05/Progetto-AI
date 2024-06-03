@@ -1,52 +1,33 @@
 import { InferenceSession, Tensor } from "onnxruntime-web";
-import { Button } from "@/components/ui/button.tsx";
-import { useRef, useEffect, useState, MouseEvent } from "react";
+import { Button, buttonVariants } from "@/components/ui/button.tsx";
+import { useRef, useState } from "react";
 import pica from "pica";
 import modelQuickDrawUrl from "../../../modello-ai/QuickDraw-drawing-recognition/model.onnx?url";
 import modelNMNISTDigitUrl from "../../../modello-ai/MNIST-digit-recognition/model.onnx?url";
-import QuickDrawProbability from "@/components/QuickDrawProbability";
-import MNISTProbability from "@/components/MNISTProbability";
+import ProbabilityDisplay from "@/components/ProbabilityDisplay";
 import { Switch } from "@/components/ui/switch.tsx";
 import { Label } from "@/components/ui/label.tsx";
-import { useNavigate } from "react-router-dom";
-import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ThumbsUp, ThumbsDown, MoveLeft } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
-import { MoveLeft } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { H1 } from "@/components/typografy/h1";
+import DrawingCanvas from "@/components/ui/drawing-canvas"; // Update the path as necessary
 
 function Playground() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const contextRef = useRef<CanvasRenderingContext2D | null>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
   const [selectedModel, setSelectedModel] = useState(false); //False = QuickDraw, True = MNIST
   const [outputModel, setOutputModel] = useState<Float32Array | null>(null);
-  const [maxClass, setMaxClass] = useState<string>(""); 
+  const [maxClass, setMaxClass] = useState<string>("");
   const [inferenceTime, setInferenceTime] = useState<number>(0);
 
   const { toast } = useToast();
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (canvas) {
-      canvas.width = 500;
-      canvas.height = 500;
-      canvas.style.width = "500px";
-      canvas.style.height = "500px";
-
-      const context = canvas.getContext("2d", { willReadFrequently: true });
-      if (context) {
-        context.scale(1, 1);
-        context.lineCap = "round";
-        context.strokeStyle = "black";
-        context.lineWidth = 20;
-        contextRef.current = context;
-      }
-    }
-  }, []);
-
-  const inferenceSession = async () => {
-    const model: string = selectedModel ? modelQuickDrawUrl : modelNMNISTDigitUrl;
+  const inferenceSession = () => {
+    const model: string = selectedModel
+      ? modelQuickDrawUrl
+      : modelNMNISTDigitUrl;
     return InferenceSession.create(model, {
       executionProviders: ["webgl"],
     });
@@ -72,13 +53,10 @@ function Playground() {
   }
 
   const updatePredictions = async () => {
-    if (contextRef.current && canvasRef.current) {
-      const image = contextRef.current.getImageData(
-        0,
-        0,
-        canvasRef.current.width,
-        canvasRef.current.height
-      );
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext("2d", { willReadFrequently: true });
+    if (context && canvas) {
+      const image = context.getImageData(0, 0, canvas.width, canvas.height);
       if (!image) {
         return;
       }
@@ -107,38 +85,8 @@ function Playground() {
     }
   };
 
-  const startDrawing = ({ nativeEvent }: MouseEvent<HTMLCanvasElement>) => {
-    const { offsetX, offsetY } = nativeEvent;
-    if (contextRef.current) {
-      contextRef.current.beginPath();
-      contextRef.current.moveTo(offsetX, offsetY);
-      setIsDrawing(true);
-    }
-  };
-
-  const finishDrawing = () => {
-    if (contextRef.current) {
-      contextRef.current.closePath();
-    }
-    setIsDrawing(false);
-    updatePredictions();
-  };
-
-  const draw = ({ nativeEvent }: MouseEvent<HTMLCanvasElement>) => {
-    if (!isDrawing) {
-      return;
-    }
-    const { offsetX, offsetY } = nativeEvent;
-    if (contextRef.current) {
-      contextRef.current.lineTo(offsetX, offsetY);
-    }
-    if (contextRef.current) {
-      contextRef.current.stroke();
-    }
-  };
-
   const clearCanvas = () => {
-    const context = contextRef.current;
+    const context = canvasRef.current?.getContext("2d");
     const canvas = canvasRef.current;
     if (context && canvas) {
       context.clearRect(0, 0, canvas.width, canvas.height);
@@ -162,7 +110,7 @@ function Playground() {
     setMaxClass("");
 
     axios.post("/api/research", {
-      model: selectedModel ? "QuickDraw": "MNIST",
+      model: selectedModel ? "QuickDraw" : "MNIST",
       outputClass: maxClass,
       correct: correct,
       elapsedTime: inferenceTime.toFixed(0),
@@ -170,22 +118,23 @@ function Playground() {
   };
 
   return (
-    <div className="flex flex-col h-screen anim_gradient text-white">
-      <h1 className="flex justify-center text-5xl m-14">
-        <b>PLAYGROUND</b>
-      </h1>
-      <Button className="absolute top-5 left-5" size={"icon"} onClick={() => {navigate('/')}}> 
+    <div className="flex flex-col h-screen anim_gradient text-white overflow-auto">
+      <H1 className="flex justify-center m-14">Playground</H1>
+      <Link
+        to="/"
+        className={cn(
+          buttonVariants({
+            variant: "outline",
+            size: "icon",
+          }),
+          "absolute top-5 left-5 dark:text-white text-black"
+        )}
+      >
         <MoveLeft className="h-5 w-5" />
-      </Button>
-      <div className="flex flex-row items-center justify-evenly">
-        <canvas
-          onMouseDown={startDrawing}
-          onMouseUp={finishDrawing}
-          onMouseMove={draw}
-          ref={canvasRef}
-          className="bg-slate-200 rounded-md"
-        />
-        <div className="flex flex-col items-center justify-center space-y-5">
+      </Link>
+      <div className="flex flex-col lg:flex-row items-center justify-evenly">
+        <DrawingCanvas ref={canvasRef} onFinishDrawing={updatePredictions} />
+        <div className="flex flex-col items-center justify-center space-y-5 mb-10 lg:mb-0">
           <div className="flex items-center space-x-2">
             <Label htmlFor="model-selector">MNIST</Label>
             <Switch
@@ -199,8 +148,11 @@ function Playground() {
             />
             <Label htmlFor="model-selector">Quick! Draw</Label>
           </div>
-          {selectedModel && <QuickDrawProbability outputModel={outputModel} setMaxClass={setMaxClass} />}
-          {!selectedModel && <MNISTProbability outputModel={outputModel} setMaxClass={setMaxClass}/>}
+            <ProbabilityDisplay
+              outputModel={outputModel}
+              setMaxClass={setMaxClass}
+              selectedModel={selectedModel}
+            />
           <Button
             onClick={clearCanvas}
             variant="destructive"
@@ -209,7 +161,10 @@ function Playground() {
             <b>Elimina</b>
           </Button>
           <div className="space-x-2">
-            <Button disabled={outputModel == null} onClick={() => handleSubmit(true)}>
+            <Button
+              disabled={outputModel == null}
+              onClick={() => handleSubmit(true)}
+            >
               <ThumbsUp className="mr-2 h-4 w-4" />
               Corretto
             </Button>
