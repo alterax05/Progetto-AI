@@ -2,15 +2,18 @@ import { ScrollArea } from "@/components/ui/scroll-area.tsx";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator.tsx";
 import { useEffect } from "react";
+import { LoaderCircle } from "lucide-react";
 
 function ProbabilityDisplay({
   outputModel,
   setMaxClass,
   selectedModel,
+  isLoading,
 }: {
   outputModel: Float32Array | null;
   setMaxClass: React.Dispatch<React.SetStateAction<string>>;
   selectedModel: boolean;
+  isLoading: boolean;
 }) {
   const classes = selectedModel
     ? [
@@ -71,9 +74,12 @@ function ProbabilityDisplay({
   }, [predictedProbability, setMaxClass]);
 
   return (
+    <>
+    <div className="flex space-x-4">
+      {isLoading ? <LoaderCircle className="animate-spin w-4"/> : <h4 className="text-base font-medium">Probabilità</h4>}
+    </div>          
     <ScrollArea className="h-72 w-full rounded-md border">
       <div className="p-4">
-        <h4 className="mb-4 text-sm font-medium leading-none">Probabilità</h4>
         {predictedProbability.map((value, index) => (
           <div key={index}>
             <div className="text-sm">
@@ -89,6 +95,7 @@ function ProbabilityDisplay({
         ))}
       </div>
     </ScrollArea>
+    </>
   );
 }
 

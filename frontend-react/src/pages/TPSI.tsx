@@ -1,6 +1,5 @@
-import { H1 } from "@/components/typografy/h1";
+import { H1, H2 } from "@/components/typografy/heading";
 import { P } from "@/components/typografy/p";
-import { H2 } from "@/components/typografy/h2";
 
 function TPSI() {
   return (

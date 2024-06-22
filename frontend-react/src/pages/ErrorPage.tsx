@@ -1,4 +1,4 @@
-import { H1 } from "@/components/typografy/h1";
+import { H1 } from "@/components/typografy/heading";
 import { P } from "@/components/typografy/p";
 function ErrorPage() {
   return (

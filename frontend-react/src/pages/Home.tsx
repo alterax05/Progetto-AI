@@ -10,7 +10,7 @@ import { MoveRight } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
 import ThemePicker from "@/components/ThemePicker";
-import { H1 } from "@/components/typografy/h1";
+import { H1 } from "@/components/typografy/heading";
 
 function Home() {
   return (

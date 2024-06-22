@@ -1,14 +1,9 @@
-import { CSSProperties } from "react";
-import ClipLoader from "react-spinners/ClipLoader";
+import { LoaderCircle } from "lucide-react";
 
 const Loading = () => {
-  const cssOverride: CSSProperties = {
-    borderWidth: 5,
-  };
-
   return (
     <div className="anim_gradient flex items-center justify-center min-h-screen">
-        <ClipLoader color={"#000"} loading={true} size={150} cssOverride={cssOverride}/>
+        <LoaderCircle className="animate-spin" size={175} strokeWidth={1}/>
     </div>
   );
 };

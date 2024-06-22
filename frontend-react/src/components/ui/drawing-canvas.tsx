@@ -1,92 +1,114 @@
 import React, {
   useRef,
   useEffect,
-  useState,
   forwardRef,
+  useImperativeHandle
 } from "react";
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-
-interface DrawingCanvasProps
-  extends React.CanvasHTMLAttributes<HTMLCanvasElement> {
+interface DrawingCanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasElement> {
   onFinishDrawing: () => void;
 }
 
 const DrawingCanvas = forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
   (props, ref) => {
-    const [isDrawing, setIsDrawing] = useState(false);
-    const contextRef = useRef<CanvasRenderingContext2D | null>(null);
-    const canvas = (ref as React.RefObject<HTMLCanvasElement>).current;
+    const isDrawingRef = useRef(false);
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
     const { onFinishDrawing, className, ...rest } = props;
 
-    function startup() {
-      canvas?.addEventListener('touchmove', (e) => draw(e), { passive: false });
-      canvas?.addEventListener('touchstart', (e) => startDrawing(e), { passive: false });
-      canvas?.addEventListener('touchend', finishDrawing);
-      canvas?.addEventListener('touchcancel', finishDrawing)
-    }
+    // Expose methods to parent component
+    useImperativeHandle(ref, () => canvasRef.current!, [onFinishDrawing]);
+
+    const setSizeCanvas = () => {
+      const canvas = canvasRef.current;
+      const context = canvas?.getContext("2d", { willReadFrequently: true });
+
+      if (canvas && context) {
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+        context.lineCap = "round";
+        context.strokeStyle = "black";
+        context.lineWidth = 15;
+      }
+    };
 
     useEffect(() => {
-      const context = canvas?.getContext("2d", { willReadFrequently: true });
-      if (!canvas || !context) {
-        return;
-      }
-      canvas.width = canvas.clientWidth;
-      canvas.height = canvas.clientHeight;
-      context.lineCap = "round";
-      context.strokeStyle = "black";
-      context.lineWidth = 15;
-      contextRef.current = context;
-      startup();
-    }, [canvas?.clientHeight, canvas?.clientWidth]);
+      window.addEventListener('resize', setSizeCanvas);
+
+      return () => {
+        window.removeEventListener('resize', setSizeCanvas);
+      };
+    }, []);
+
+    useEffect(() => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      setSizeCanvas();
+
+      const handleTouchMove = (e: TouchEvent) => draw(e);
+      const handleTouchStart = (e: TouchEvent) => startDrawing(e);
+
+      canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+      canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+
+      return () => {
+        canvas.removeEventListener('touchmove', handleTouchMove);
+        canvas.removeEventListener('touchstart', handleTouchStart);
+      };
+    }, []);
     
-    const startDrawing = (event : MouseEvent | TouchEvent) => {
+    const startDrawing = (event: MouseEvent | TouchEvent) => {
       let canvasOffsetX, canvasOffsetY;
-      if(event instanceof TouchEvent) {
+      if (event instanceof TouchEvent) {
         event.preventDefault();
         const { clientX, clientY } = event.touches[0];
-        const rect = canvas!.getBoundingClientRect();
+        const rect = canvasRef.current!.getBoundingClientRect();
         canvasOffsetX = clientX - rect.left;
         canvasOffsetY = clientY - rect.top;
-      }else{
+      } else {
         const { offsetX, offsetY } = event;
         canvasOffsetX = offsetX;
         canvasOffsetY = offsetY;
       }
-      if (contextRef.current) {
-        contextRef.current.beginPath();
-        contextRef.current.moveTo(canvasOffsetX, canvasOffsetY);
-        setIsDrawing(true);
+      const context = canvasRef.current?.getContext("2d", { willReadFrequently: true });
+      isDrawingRef.current = true;
+      if (context) {
+        context.beginPath();
+        context.moveTo(canvasOffsetX, canvasOffsetY);
       }
-      console.log(isDrawing);
+      else{
+        console.log("context is null");
+      }
     };
 
     const finishDrawing = () => {
-      if (contextRef.current) {
-        contextRef.current.closePath();
-      }
-      setIsDrawing(false);
+      if(isDrawingRef.current === false) return;
+      isDrawingRef.current = false; // Update the mutable reference
+      canvasRef.current?.getContext("2d", { willReadFrequently: true })?.closePath();
       onFinishDrawing();
     };
 
     const draw = (event: MouseEvent | TouchEvent) => {
+      if (!isDrawingRef.current) return; // Check the mutable reference
+
       let canvasOffsetX, canvasOffsetY;
-      if(event instanceof TouchEvent){
+      if (event instanceof TouchEvent) {
         event.preventDefault();
         const { clientX, clientY } = event.touches[0];
-        const rect = canvas!.getBoundingClientRect();
+        const rect = canvasRef.current!.getBoundingClientRect();
         canvasOffsetX = clientX - rect.left;
         canvasOffsetY = clientY - rect.top;
-      }
-      else if(event instanceof MouseEvent && isDrawing){
+      } else if (event instanceof MouseEvent) {
         const { offsetX, offsetY } = event;
         canvasOffsetX = offsetX;
         canvasOffsetY = offsetY;
       }
-      if (contextRef.current && canvasOffsetX && canvasOffsetY) {
-        contextRef.current.lineTo(canvasOffsetX, canvasOffsetY);
-        contextRef.current.stroke();
+
+      const context = canvasRef.current?.getContext("2d", { willReadFrequently: true });
+      if (context && canvasOffsetX && canvasOffsetY) {
+        context.lineTo(canvasOffsetX, canvasOffsetY);
+        context.stroke();
       }
     };
 
@@ -97,8 +119,13 @@ const DrawingCanvas = forwardRef<HTMLCanvasElement, DrawingCanvasProps>(
         onMouseMove={(e) => draw(e.nativeEvent)}
         onMouseOut={finishDrawing}
         onDragExit={finishDrawing}
-        ref={ref}
-        className={cn("bg-slate-200 rounded-md h-[40vh] w-[40vh] mb-4 lg:h-[70vh] lg:w-[70vh] lg:mb-0", className)}
+        onTouchEnd={finishDrawing}
+        onTouchCancel={finishDrawing}
+        ref={canvasRef}
+        className={cn(
+          "bg-slate-200 rounded-md h-[40vh] w-[40vh] mb-4 lg:h-[70vh] lg:w-[70vh] lg:mb-0",
+          className
+        )}
         {...rest}
       />
     );
