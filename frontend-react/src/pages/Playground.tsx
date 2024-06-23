@@ -56,8 +56,8 @@ function Playground() {
         title: "Grazie mille!",
         description: (
           <p>
-            Grazie per averci aiutato nella nostra ricerca! <br /> Michele e
-            Giovanni
+            Grazie per averci aiutato nella nostra ricerca! <br /> <i>Michele e
+            Giovanni</i>
           </p>
         ),
       });
@@ -187,6 +187,7 @@ function Playground() {
           />
           <Button
             onClick={clearCanvas}
+            disabled={outputModel == null || reviewMutation.isPending}
             variant="destructive"
             className="w-full"
           >
@@ -194,7 +195,7 @@ function Playground() {
           </Button>
           <div className="space-x-2">
             <Button
-              disabled={outputModel == null}
+              disabled={outputModel == null || reviewMutation.isPending}
               onClick={() => {
                 reviewMutation.mutate(true);
               }}
@@ -207,7 +208,7 @@ function Playground() {
               Corretto
             </Button>
             <Button
-              disabled={outputModel == null}
+              disabled={outputModel == null || reviewMutation.isPending}
               variant={"outline"}
               className="text-black dark:text-white"
               onClick={() => {

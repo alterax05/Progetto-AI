@@ -486,3 +486,6 @@ $RECYCLE.BIN/
 # Appsettings
 appsettings.json
 appsettings.Development.json
+
+#React files (generated)
+wwwroot/

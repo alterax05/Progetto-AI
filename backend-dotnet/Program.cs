@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 
 namespace Progetto_AI_API
 {
@@ -39,15 +41,26 @@ namespace Progetto_AI_API
 
             app.UseAuthorization();
 
+            var provider = new FileExtensionContentTypeProvider();
+
+            provider.Mappings[".onnx"] = "application/octet-stream";
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                ContentTypeProvider = provider
+            });
+
             app.MapPost("/api/research", (RecensioneUtente recensione, ProgettoAIDbContext db) =>
             {
-                if(string.IsNullOrEmpty(recensione.Model) || string.IsNullOrEmpty(recensione.OutputClass))
+                if (string.IsNullOrEmpty(recensione.Model) || string.IsNullOrEmpty(recensione.OutputClass))
                 {
-                    return ;
+                    return Results.BadRequest();
                 }
 
                 db.Add(recensione);
                 db.SaveChanges();
+
+                return Results.Created();
             });
 
             app.MapGet("/api/research", (ProgettoAIDbContext db) =>
@@ -58,13 +71,13 @@ namespace Progetto_AI_API
             app.MapGet("api/research/comparison", (ProgettoAIDbContext db) =>
             {
                 ComparisonModels[] result = [..from recensioni in db.RecensioniUtenti
-                                             group recensioni by recensioni.Model into modello
-                                             select new ComparisonModels
-                                             {
-                                                 total = modello.Count(),
-                                                 correct = modello.Count(row => row.Correct),
-                                                 label = modello.Key
-                                             }];
+                                                 group recensioni by recensioni.Model into modello
+                                                 select new ComparisonModels
+                                                 {
+                                                     total = modello.Count(),
+                                                     correct = modello.Count(row => row.Correct),
+                                                     label = modello.Key
+                                                 }];
 
                 return result;
             });
@@ -83,6 +96,8 @@ namespace Progetto_AI_API
 
                 return result;
             });
+
+            app.MapFallbackToFile("index.html");
 
             app.Run();
         }

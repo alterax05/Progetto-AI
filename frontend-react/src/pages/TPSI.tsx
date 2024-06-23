@@ -12,6 +12,7 @@ import { Bar } from "react-chartjs-2";
 import { H1, H2 } from "@/components/typografy/heading";
 import { P } from "@/components/typografy/p";
 import { useQuery } from "@tanstack/react-query";
+import { LoaderCircle } from "lucide-react";
 
 interface DataGraphComparison {
   label: string;
@@ -190,6 +191,67 @@ function TPSI() {
         differenza di PyTorch, TensorFlow supporta nativate l'ambiente web con
         la libreria TensorFlow.js.
       </P>
+      <H2>Risultati dei modelli</H2>
+      <div className="w-full h-80 flex justify-center items-center">
+        {!comparisonModels.isLoading && comparisonModels.data ? (
+          <Graph
+            graphData={comparisonModels.data}
+            title="Confronto tra i modelli AI"
+          />
+        ) : (
+          <LoaderCircle className="h-16 w-16 animate-spin" />
+        )}
+      </div>
+      <div className="flex lg:flex-row lg:space-x-2 flex-col">
+        <div>
+          <P>
+            Percentuale di successo di MNIST:{" "}
+            {comparisonModels.data
+              ? (
+                  (comparisonModels.data[0].correct /
+                    comparisonModels.data[0].total) *
+                  100
+                ).toFixed(2) + "%"
+              : comparisonModels.isLoading
+              ? "Caricamento"
+              : 0 + "%"}
+          </P>
+        </div>
+        <div>
+          <P>
+            Percentuale di successo di Quick, Draw!:{" "}
+            {comparisonModels.data
+              ? (
+                  (comparisonModels.data[1].correct /
+                    comparisonModels.data[1].total) *
+                  100
+                ).toFixed(2) + "%"
+              : comparisonModels.isLoading
+              ? "Caricamento"
+              : 0 + "%"}
+          </P>
+        </div>
+      </div>
+      <div className="w-full h-80 flex justify-center items-center">
+        {!comparisonQuickDraw.isLoading && comparisonMNIST.data ? (
+          <Graph
+            graphData={comparisonMNIST.data}
+            title="Performance del modello MNIST"
+          />
+        ) : (
+          <LoaderCircle className="h-16 w-16 animate-spin" />
+        )}
+      </div>
+      <div className="w-full h-80 flex justify-center items-center">
+        {!comparisonQuickDraw.isLoading && comparisonQuickDraw.data ? (
+          <Graph
+            graphData={comparisonQuickDraw.data}
+            title="Performance del modello QuickDraw"
+          />
+        ) : (
+          <LoaderCircle className="h-16 w-16 animate-spin" />
+        )}
+      </div>
       <H2>Possibili Miglioramenti</H2>
       <P>
         Con le conoscenze attuali non è chiaro come migliorare ulteriormente il
@@ -203,54 +265,6 @@ function TPSI() {
       <P>
         <b>Michele Porcellato e Giovanni De Quattro</b>
       </P>
-      <div className="w-full h-80">
-        {comparisonModels.data && (
-          <Graph
-            graphData={comparisonModels.data}
-            title="Confronto tra i modelli AI"
-          />
-        )}
-      </div>
-      <div className="flex lg:flex-row lg:space-x-2 flex-col">
-        <div>
-          <P>
-            Percentuale di successo di MNIST:{" "}
-            {comparisonModels.data
-              ? ((comparisonModels.data[0].correct /
-                  comparisonModels.data[0].total) *
-                100).toFixed(2).toString()
-              : 0}
-            %
-          </P>
-        </div>
-        <div>
-          <P>
-            Percentuale di successo di Quick, Draw!:{" "}
-            {comparisonModels.data
-              ? ((comparisonModels.data[1].correct /
-                  comparisonModels.data[1].total) *
-                100).toFixed(2).toString()
-              : 0}
-            %
-          </P>
-        </div>
-      </div>
-      <div className="w-full h-80">
-        {comparisonMNIST.data && (
-          <Graph
-            graphData={comparisonMNIST.data}
-            title="Performance del modello MNIST"
-          />
-        )}
-      </div>
-      <div className="w-full h-80">
-        {comparisonQuickDraw.data && (
-          <Graph
-            graphData={comparisonQuickDraw.data}
-            title="Performance del modello QuickDraw"
-          />
-        )}
-      </div>
     </div>
   );
 }
