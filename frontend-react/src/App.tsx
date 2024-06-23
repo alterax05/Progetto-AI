@@ -22,7 +22,6 @@ const App = () => {
   const queryClient = new QueryClient();
 
   return (
-    <StrictMode>
       <QueryClientProvider client={queryClient}>
         <Router>
           <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
@@ -40,10 +39,11 @@ const App = () => {
         </Router>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
-    </StrictMode>
   );
 };
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <App />
+  <StrictMode>
+    <App />
+  </StrictMode>
 );
