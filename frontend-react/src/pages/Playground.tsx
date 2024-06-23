@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import { InferenceSession, Tensor } from "onnxruntime-web";
 import pica from "pica";
 import modelQuickDrawUrl from "../../../modello-ai/QuickDraw-drawing-recognition/model.onnx?url";
@@ -13,7 +13,7 @@ import axios from "axios";
 import { cn } from "@/lib/utils";
 import { H1 } from "@/components/typografy/heading";
 import DrawingCanvas from "@/components/ui/drawing-canvas";
-import { useMutation } from "react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button, buttonVariants } from "@/components/ui/button.tsx";
 
 const resize = pica();
@@ -24,15 +24,15 @@ function Playground() {
   const [outputModel, setOutputModel] = useState<Float32Array | null>(null);
   const [maxClass, setMaxClass] = useState<string>("");
   const [inferenceTime, setInferenceTime] = useState<number>(0);
-  const [correct, setCorrect] = useState<boolean | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [session, setSession] = useState<InferenceSession>();
 
   const { toast } = useToast();
 
-  const mutation = useMutation({
-    mutationKey: "research",
-    onMutate: async () => {
+
+  const reviewMutation = useMutation({
+    mutationKey: ["research"],
+    retry: 3,
+    mutationFn: async (correct: boolean) => {
       if (correct === null) {
         throw new Error("Correct is null");
       }
@@ -65,6 +65,15 @@ function Playground() {
     },
   });
 
+  const aiModel = useQuery({
+    queryKey: ["ai-model", selectedModel],
+    staleTime: 1000 * 60 * 60 * 24,
+    queryFn: async () => {
+      const res = await loadSession();
+      return res;
+    },
+  });
+
   async function loadSession() {
     const model = selectedModel ? modelQuickDrawUrl : modelNMNISTDigitUrl;
     const newSession = await InferenceSession.create(model, {
@@ -72,12 +81,6 @@ function Playground() {
     });
     return newSession;
   }
-
-  useEffect(() => {
-    loadSession().then((res) => {
-      setSession(res);
-    });
-  }, [selectedModel]);
 
   function imageDataToTensor(
     imageBuffer: Uint8ClampedArray,
@@ -101,6 +104,7 @@ function Playground() {
   async function updatePredictions() {
     const canvas = canvasRef.current;
     const context = canvas?.getContext("2d", { willReadFrequently: true });
+    const session = aiModel.data;
     if (context && canvas && session) {
       const image = context.getImageData(0, 0, canvas.width, canvas.height);
 
@@ -145,11 +149,9 @@ function Playground() {
     setMaxClass("");
   }
 
-  function handleSubmit() {
-    mutation.mutate();
-    setOutputModel(null);
+  function handleSubmit(correct: boolean) {
+    reviewMutation.mutate(correct);
     clearCanvas();
-    setMaxClass("");
   }
 
   return (
@@ -177,7 +179,6 @@ function Playground() {
               value={selectedModel.toString()}
               onClick={() => {
                 clearCanvas();
-                setOutputModel(null);
                 setSelectedModel(!selectedModel);
               }}
             />
@@ -200,11 +201,10 @@ function Playground() {
             <Button
               disabled={outputModel == null}
               onClick={() => {
-                setCorrect(true);
-                handleSubmit();
+                handleSubmit(true);
               }}
             >
-              {mutation.isLoading && correct === true ? (
+              {reviewMutation.isPending && reviewMutation.variables === true ? (
                 <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <ThumbsUp className="mr-2 h-4 w-4" />
@@ -216,11 +216,10 @@ function Playground() {
               variant={"outline"}
               className="text-black dark:text-white"
               onClick={() => {
-                setCorrect(false);
-                handleSubmit();
+                handleSubmit(false);
               }}
             >
-              {mutation.isLoading && correct === false ? (
+              {reviewMutation.isPending && reviewMutation.variables === false ? (
                 <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <ThumbsDown className="mr-2 h-4 w-4" />
