@@ -11,7 +11,7 @@ import {
 } from "chart.js";
 import { useEffect } from "react";
 import { useState } from "react";
-import { Bar, Chart } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 
 interface DataGraphComparison {
   label: string;
@@ -25,10 +25,95 @@ function TPSI() {
   >([]);
 
   useEffect(() => {
-    fetch("/api/research/comparison-between-models")
+    /*fetch("/api/research/comparison")
       .then((response) => response.json())
       .then((data) => setDataGraphComparison(data));
-  }, []);
+      */
+
+    setDataGraphComparison([
+      {
+        "label": "Aereo",
+        "total": 5,
+        "correct": 5
+      },
+      {
+        "label": "Ambulanza",
+        "total": 1,
+        "correct": 1
+      },
+      {
+        "label": "Asparagi",
+        "total": 3,
+        "correct": 3
+      },
+      {
+        "label": "Banana",
+        "total": 2,
+        "correct": 2
+      },
+      {
+        "label": "Chitarra",
+        "total": 2,
+        "correct": 2
+      },
+      {
+        "label": "Elefante",
+        "total": 1,
+        "correct": 1
+      },
+      {
+        "label": "Maglietta",
+        "total": 1,
+        "correct": 1
+      },
+      {
+        "label": "Mela",
+        "total": 5,
+        "correct": 5
+      },
+      {
+        "label": "Palla da baseball",
+        "total": 2,
+        "correct": 2
+      },
+      {
+        "label": "Palla da basket",
+        "total": 1,
+        "correct": 1
+      },
+      {
+        "label": "Pupazzo di neve",
+        "total": 1,
+        "correct": 1
+      },
+      {
+        "label": "Tazza da caffè",
+        "total": 1,
+        "correct": 1
+      },
+      {
+        "label": "Televisione",
+        "total": 2,
+        "correct": 2
+      },
+      {
+        "label": "Torre Eiffel",
+        "total": 2,
+        "correct": 2
+      },
+      {
+        "label": "Torta di compleanno",
+        "total": 1,
+        "correct": 1
+      },
+      {
+        "label": "Triangolo",
+        "total": 4,
+        "correct": 4
+      }
+    ]);
+    }, []);
+
 
   ChartJS.register(
     CategoryScale,
@@ -41,7 +126,7 @@ function TPSI() {
 
   ChartJS.defaults.color = "white";
 
-  let DataGraphComparisonComponent = () => {
+  const DataGraphComparisonComponent = () => {
     const data = {
       labels: dataGraphComparison.map((info) => info.label),
       datasets: [
@@ -57,8 +142,10 @@ function TPSI() {
         },
       ],
     };
+
     const options = {
       responsive: true,
+      maintainAspectRatio: false, // Allows the chart to resize based on the container size
       plugins: {
         legend: {
           position: "top" as const,
@@ -208,21 +295,28 @@ function TPSI() {
         <Heading as="h2" size="xl" mb={4}>
           Grafici
         </Heading>
-        <div className="w-1/2">
+        <div className="w-full h-80">
           <DataGraphComparisonComponent />
         </div>
-        <Text>
+        <div className="flex lg:flex-row lg:space-x-2 flex-col">
+        <Text >
           Percentuale di successo di MNIST:{" "}
           {(DataGraphComparisonComponent().props.data.datasets[1].data[0] /
             DataGraphComparisonComponent().props.data.datasets[0].data[0]) *
             100}
-          % <br />
+          %
+        </Text>
+        <Text >
           Percentuale di successo di Quick, Draw!:{" "}
           {(DataGraphComparisonComponent().props.data.datasets[1].data[1] /
             DataGraphComparisonComponent().props.data.datasets[0].data[1]) *
             100}
           %
         </Text>
+        </div>
+        <div className="w-full h-80">
+          <DataGraphComparisonComponent />
+        </div>
         <Box>
           <Text>
             <b>Michele Porcellato e Giovanni De Quattro</b>
