@@ -1,7 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql;
-using Microsoft.EntityFrameworkCore.Design;
-using System.Diagnostics;
 
 namespace Progetto_AI_API
 {
@@ -53,50 +50,33 @@ namespace Progetto_AI_API
                 return db.RecensioniUtenti?.ToList();
             });
 
-            app.MapGet("/api/research/relation-time-correctness", (ProgettoAIDbContext db) =>
+            app.MapGet("api/research/comparison", (ProgettoAIDbContext db) =>
             {
-                List<RecensioneUtente> reviews = db.RecensioniUtenti?.ToList() ?? [];
+                ComparisonModels[] result = [..from recensioni in db.RecensioniUtenti
+                                             group recensioni by recensioni.Model into modello
+                                             select new ComparisonModels
+                                             {
+                                                 total = modello.Count(),
+                                                 correct = modello.Count(row => row.Correct),
+                                                 label = modello.Key
+                                             }];
 
-                var relationTimeCorrectness = new RelationTimeCorrectness();
-
-                var n = reviews.Count;
-                var n1 = reviews.Count(r => r.Correct);
-                var n2 = n - n1;
-
-                var mean1 = reviews.Where(r => r.Correct).Average(r => r.ElapsedTime);
-                var mean2 = reviews.Where(r => !r.Correct).Average(r => r.ElapsedTime);
-
-                var mean = reviews.Average(r => r.ElapsedTime);
-
-                var sumOfSquares = reviews.Sum(r => Math.Pow(r.ElapsedTime - mean, 2));
-                var standardDeviation = Math.Sqrt(sumOfSquares / (n - 1));
-
-                var pointBiserial = (mean1 - mean2) / standardDeviation * Math.Sqrt(n1 * n2 / Math.Pow(n, 2));
-                
-                relationTimeCorrectness.CorrelationValue = pointBiserial;
-                
-                reviews.Select(r => r.ElapsedTime).Distinct().ToList().ForEach(time =>
-                {
-                    var timeCorrectness = new TimeCorrectness();
-                    timeCorrectness.Time = time;
-                    timeCorrectness.Correctness = reviews.Where(r => r.ElapsedTime == time).All(r => r.Correct);
-                    relationTimeCorrectness.TimeCorrectness.Add(timeCorrectness);
-                });
-
-                return relationTimeCorrectness;
+                return result;
             });
 
-            app.MapGet("api/research/comparison-between-models", (ProgettoAIDbContext db) =>
+            app.MapGet("api/research/comparison/{model}", (ProgettoAIDbContext db, string model) =>
             {
-                string[] models = db.RecensioniUtenti?.Select(x => x.Model).Distinct().ToArray() ?? [];
-                List<ComparisonModels> comparisons = [];
-                foreach(var model in models)
-                {
-                    int total = db.RecensioniUtenti?.Count(x => x.Model == model) ?? 0;
-                    int correct = db.RecensioniUtenti?.Count(x=> x.Model == model && x.Correct == true) ?? 0;
-                    comparisons.Add(new ComparisonModels() { correct = correct, label=model, total=total });
-                }
-                return comparisons;
+                var result = from recensioni in db.RecensioniUtenti
+                             where recensioni.Model == model
+                             group recensioni by recensioni.OutputClass into output
+                             select new ComparisonModels
+                             {
+                                 total = output.Count(),
+                                 correct = output.Count(row => row.Correct),
+                                 label = output.Key
+                             };
+
+                return result;
             });
 
             app.Run();
