@@ -1,7 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql;
-using Microsoft.EntityFrameworkCore.Design;
-using System.Diagnostics;
 
 namespace Progetto_AI_API
 {
@@ -44,13 +41,47 @@ namespace Progetto_AI_API
 
             app.MapPost("/api/research", (RecensioneUtente recensione, ProgettoAIDbContext db) =>
             {
+                if(string.IsNullOrEmpty(recensione.Model) || string.IsNullOrEmpty(recensione.OutputClass))
+                {
+                    return ;
+                }
+
                 db.Add(recensione);
                 db.SaveChanges();
             });
-            
-            app.MapGet("/api/research", () =>
+
+            app.MapGet("/api/research", (ProgettoAIDbContext db) =>
             {
-                return "ciao";
+                return db.RecensioniUtenti?.ToList();
+            });
+
+            app.MapGet("api/research/comparison", (ProgettoAIDbContext db) =>
+            {
+                ComparisonModels[] result = [..from recensioni in db.RecensioniUtenti
+                                             group recensioni by recensioni.Model into modello
+                                             select new ComparisonModels
+                                             {
+                                                 total = modello.Count(),
+                                                 correct = modello.Count(row => row.Correct),
+                                                 label = modello.Key
+                                             }];
+
+                return result;
+            });
+
+            app.MapGet("api/research/comparison/{model}", (ProgettoAIDbContext db, string model) =>
+            {
+                var result = from recensioni in db.RecensioniUtenti
+                             where recensioni.Model == model
+                             group recensioni by recensioni.OutputClass into output
+                             select new ComparisonModels
+                             {
+                                 total = output.Count(),
+                                 correct = output.Count(row => row.Correct),
+                                 label = output.Key
+                             };
+
+                return result;
             });
 
             app.Run();

@@ -28,7 +28,6 @@ function Playground() {
 
   const { toast } = useToast();
 
-
   const reviewMutation = useMutation({
     mutationKey: ["research"],
     retry: 3,
@@ -62,6 +61,7 @@ function Playground() {
           </p>
         ),
       });
+      clearCanvas();
     },
   });
 
@@ -149,11 +149,6 @@ function Playground() {
     setMaxClass("");
   }
 
-  function handleSubmit(correct: boolean) {
-    reviewMutation.mutate(correct);
-    clearCanvas();
-  }
-
   return (
     <div className="flex flex-col h-screen anim_gradient text-white overflow-auto">
       <H1 className="flex justify-center m-14">Playground</H1>
@@ -201,7 +196,7 @@ function Playground() {
             <Button
               disabled={outputModel == null}
               onClick={() => {
-                handleSubmit(true);
+                reviewMutation.mutate(true);
               }}
             >
               {reviewMutation.isPending && reviewMutation.variables === true ? (
@@ -216,10 +211,11 @@ function Playground() {
               variant={"outline"}
               className="text-black dark:text-white"
               onClick={() => {
-                handleSubmit(false);
+                reviewMutation.mutate(false);
               }}
             >
-              {reviewMutation.isPending && reviewMutation.variables === false ? (
+              {reviewMutation.isPending &&
+              reviewMutation.variables === false ? (
                 <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <ThumbsDown className="mr-2 h-4 w-4" />
