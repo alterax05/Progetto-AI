@@ -168,7 +168,7 @@ function TPSI() {
         deep learning PyTorch. Essa è una libreria open-source che offre
         supporto per lo sviluppo di reti neurali, facilitando la definizione,
         l'addestramento e l'implementazione di modelli di machine learning.
-        Grazie a "PyTorch" e "Gooogle Colab" è stato possibile addestrare i
+        Grazie a "PyTorch" e "Google Colab" è stato possibile addestrare i
         modelli usando la potenza di calcolo delle GPU, accellerando cosi il
         processo. Infatti si è passati da un tempo di addestramento di 30 minuti
         a 7 minuti nel caso di "Quick, Draw". Per implementare i modelli sul Web
