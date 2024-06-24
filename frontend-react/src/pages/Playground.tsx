@@ -15,6 +15,7 @@ import { H1 } from "@/components/typografy/heading";
 import DrawingCanvas from "@/components/ui/drawing-canvas";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button, buttonVariants } from "@/components/ui/button.tsx";
+import { Skeleton } from "@/components/ui/skeleton.tsx";
 
 const resize = pica();
 
@@ -56,8 +57,8 @@ function Playground() {
         title: "Grazie mille!",
         description: (
           <p>
-            Grazie per averci aiutato nella nostra ricerca! <br /> <i>Michele e
-            Giovanni</i>
+            Grazie per averci aiutato nella nostra ricerca! <br />{" "}
+            <i>Michele e Giovanni</i>
           </p>
         ),
       });
@@ -102,6 +103,7 @@ function Playground() {
   }
 
   async function updatePredictions() {
+    setLoading(true);
     const canvas = canvasRef.current;
     const context = canvas?.getContext("2d", { willReadFrequently: true });
     const session = aiModel.data;
@@ -111,8 +113,6 @@ function Playground() {
       if (!image) {
         return;
       }
-
-      setLoading(true);
 
       const resizeImageData = new Uint8ClampedArray(
         await resize.resizeBuffer({
@@ -134,9 +134,9 @@ function Playground() {
       setOutputModel(outputTensor.data as Float32Array);
 
       const endTime = performance.now();
-      setLoading(false);
       setInferenceTime(endTime - startTime);
     }
+    setLoading(false);
   }
 
   function clearCanvas() {
@@ -165,7 +165,15 @@ function Playground() {
         <MoveLeft className="h-5 w-5" />
       </Link>
       <div className="flex flex-col lg:flex-row items-center justify-evenly">
-        <DrawingCanvas ref={canvasRef} onFinishDrawing={updatePredictions} />
+        {aiModel.isLoading ? (
+          <Skeleton className="bg-slate-200 rounded-md h-[40vh] w-[40vh] mb-4 lg:h-[70vh] lg:w-[70vh] lg:mb-0">
+            <div className="flex items-center justify-center h-full">
+              <LoaderCircle className="h-10 w-10 animate-spin" color="black" />
+            </div>
+          </Skeleton>
+        ) : (
+          <DrawingCanvas ref={canvasRef} onFinishDrawing={updatePredictions} />
+        )}
         <div className="flex flex-col items-center justify-center space-y-5 mb-10 lg:mb-0">
           <div className="flex items-center space-x-2">
             <Label htmlFor="model-selector">MNIST</Label>
